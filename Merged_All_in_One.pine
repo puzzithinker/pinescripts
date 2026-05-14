@@ -2629,15 +2629,15 @@ if leadingindicator == 'Trend Meter' or respecttm
     wt_bear = WTCross and WTCrossDown
 
     // Leading signals (event-based: fire on alignment change)
-    tm3_was_bear = nz(tm3_bear[1])
-    tm3_was_bull = nz(tm3_bull[1])
+    tm3_was_bear = not na(tm3_bear[1]) and tm3_bear[1]
+    tm3_was_bull = not na(tm3_bull[1]) and tm3_bull[1]
 
     if tm_mode == "3 TM Align"
         tm_long := tm3_bull and tm3_was_bear
         tm_short := tm3_bear and tm3_was_bull
     else if tm_mode == "3 TM + 2 TB Align"
-        tm_long := tm3_bull and tb_bull and not (nz(tm3_bull[1]) and nz(tb_bull[1]))
-        tm_short := tm3_bear and tb_bear and not (nz(tm3_bear[1]) and nz(tb_bear[1]))
+        tm_long := tm3_bull and tb_bull and not ((not na(tm3_bull[1]) and tm3_bull[1]) and (not na(tb_bull[1]) and tb_bull[1]))
+        tm_short := tm3_bear and tb_bear and not ((not na(tm3_bear[1]) and tm3_bear[1]) and (not na(tb_bear[1]) and tb_bear[1]))
     else if tm_mode == "3 TM + 2 TB + WT"
         tm_long := tm3_bull and tb_bull and wt_bull
         tm_short := tm3_bear and tb_bear and wt_bear
