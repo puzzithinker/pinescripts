@@ -4062,18 +4062,21 @@ smc_storeOB(smc_pivot p_ivot, bool internal, int bias) =>
 bool smc_ob_bull_mitigated = false
 bool smc_ob_bear_mitigated = false
 
-smc_deleteOBs(bool internal = false) =>
+[bool, bool] smc_deleteOBs(bool internal = false) =>
     array<smc_orderBlock> obs = internal ? smc_internalOBs : smc_swingOBs
+    bool _bear_mit = false
+    bool _bull_mit = false
     for [index, eachOB] in obs
         bool crossed = false
         if smc_bearMitSrc > eachOB.barHigh and eachOB.bias == SMC_BEARISH
             crossed := true
-            smc_ob_bear_mitigated := true
+            _bear_mit := true
         else if smc_bullMitSrc < eachOB.barLow and eachOB.bias == SMC_BULLISH
             crossed := true
-            smc_ob_bull_mitigated := true
+            _bull_mit := true
         if crossed
             obs.remove(index)
+    [_bear_mit, _bull_mit]
 
 smc_drawOBs(bool internal = false) =>
     array<smc_orderBlock> obs = internal ? smc_internalOBs : smc_swingOBs
@@ -4221,8 +4224,12 @@ if switch_smc or respectsmc or leadingindicator == "Smart Money Concepts"
 
     // Order blocks
     if smc_show_ob
-        smc_deleteOBs(true)
-        smc_deleteOBs(false)
+        [_bm1, _bl1] = smc_deleteOBs(true)
+        [_bm2, _bl2] = smc_deleteOBs(false)
+        if _bm1 or _bm2
+            smc_ob_bear_mitigated := true
+        if _bl1 or _bl2
+            smc_ob_bull_mitigated := true
 
     // FVGs
     if smc_show_fvg
