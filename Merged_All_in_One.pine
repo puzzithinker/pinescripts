@@ -4117,9 +4117,9 @@ smc_drawFVGs() =>
     fvgBullColor = smc_style == "Monochrome" ? color.new(SMC_MONO_BULL, 70) : color.new(#00ff68, 70)
     fvgBearColor = smc_style == "Monochrome" ? color.new(SMC_MONO_BEAR, 70) : color.new(#ff0008, 70)
     if bullishFVG
-        smc_fvgs.unshift(smc_fairValueGap.new(low, high[2], SMC_BULLISH, box.new(chart.point.new(time[1], na, low), chart.point.new(time, na, math.avg(low, high[2])), border_color=fvgBullColor, bgcolor=fvgBullColor), box.new(chart.point.new(time[1], na, math.avg(low, high[2])), chart.point.new(time, na, high[2]), border_color=fvgBullColor, bgcolor=fvgBullColor)))
+        smc_fvgs.unshift(smc_fairValueGap.new(low, high[2], SMC_BULLISH, box.new(bar_index - 1, low, bar_index, math.avg(low, high[2]), border_color=fvgBullColor, bgcolor=fvgBullColor), box.new(bar_index - 1, math.avg(low, high[2]), bar_index, high[2], border_color=fvgBullColor, bgcolor=fvgBullColor)))
     if bearishFVG
-        smc_fvgs.unshift(smc_fairValueGap.new(high, low[2], SMC_BEARISH, box.new(chart.point.new(time[1], na, high), chart.point.new(time, na, math.avg(high, low[2])), border_color=fvgBearColor, bgcolor=fvgBearColor), box.new(chart.point.new(time[1], na, math.avg(high, low[2])), chart.point.new(time, na, low[2]), border_color=fvgBearColor, bgcolor=fvgBearColor)))
+        smc_fvgs.unshift(smc_fairValueGap.new(high, low[2], SMC_BEARISH, box.new(bar_index - 1, high, bar_index, math.avg(high, low[2]), border_color=fvgBearColor, bgcolor=fvgBearColor), box.new(bar_index - 1, math.avg(high, low[2]), bar_index, low[2], border_color=fvgBearColor, bgcolor=fvgBearColor)))
 
 smc_getStructure(int size, bool equalHL = false, bool internal = false) =>
     currentLeg = smc_leg(size)
