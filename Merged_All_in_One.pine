@@ -324,61 +324,67 @@ session_time = input.session("0900-1600", "", group=confirmation_group, inline='
 
 // Preset overrides: effective values that combine user input with preset selection
 // When preset != "Custom", override the relevant respect* values
-bool eff_respectema        = preset == "Trend Follower" ? true : preset == "All Filters" ? true : respectema
-bool eff_respect2ma        = preset == "Trend Follower" ? true : preset == "All Filters" ? true : respect2ma
-bool eff_respect3ma        = preset == "All Filters" ? true : respect3ma
-bool eff_respectrf         = preset == "Breakout Trader" ? true : preset == "All Filters" ? true : respectrf
-bool eff_respectrqk        = preset == "All Filters" ? true : respectrqk
-bool eff_respectst         = preset == "Trend Follower" ? true : preset == "All Filters" ? true : respectst
-bool eff_respectht         = preset == "All Filters" ? true : respectht
-bool eff_respectdonchian   = preset == "All Filters" ? true : respectdonchian
-bool eff_respectroc        = preset == "All Filters" ? true : respectroc
-bool eff_respecttsi        = preset == "All Filters" ? true : respecttsi
-bool eff_respecttdfi       = preset == "All Filters" ? true : respecttdfi
-bool eff_respectmd         = preset == "All Filters" ? true : respectmd
-bool eff_respectdpo        = preset == "All Filters" ? true : respectdpo
-bool eff_respectichi       = preset == "All Filters" ? true : respectichi
-bool eff_respectsuperichi  = preset == "All Filters" ? true : respectsuperichi
-bool eff_respecttrendline_breakout = preset == "All Filters" ? true : respecttrendline_breakout
-bool eff_respectrd         = preset == "All Filters" ? true : respectrd
-bool eff_respecthacolt     = preset == "All Filters" ? true : respecthacolt
-bool eff_respectbx         = preset == "All Filters" ? true : respectbx
-bool eff_respectbbpt       = preset == "All Filters" ? true : respectbbpt
-bool eff_respectvwap       = preset == "All Filters" ? true : respectvwap
-bool eff_respectbbosc      = preset == "All Filters" ? true : respectbbosc
-bool eff_respectce         = preset == "All Filters" ? true : respectce
-bool eff_respectcci        = preset == "All Filters" ? true : respectcci
-bool eff_respectao         = preset == "All Filters" ? true : respectao
-bool eff_respectadx        = preset == "All Filters" ? true : respectadx
-bool eff_respectsar        = preset == "All Filters" ? true : respectsar
-bool eff_respectwae        = preset == "All Filters" ? true : respectwae
-bool eff_respectvo         = preset == "All Filters" ? true : respectvo
-bool eff_respectci         = preset == "All Filters" ? true : respectci
-bool eff_respectdv         = preset == "All Filters" ? true : respectdv
-bool eff_respectstochastic = preset == "All Filters" ? true : respectstochastic
-bool eff_respectrsi        = preset == "All Filters" ? true : respectrsi
-bool eff_respectrsima      = preset == "All Filters" ? true : respectrsima
-bool eff_respectrsilimit   = preset == "All Filters" ? true : respectrsilimit
-bool eff_respectrsimalimit = preset == "All Filters" ? true : respectrsimalimit
-bool eff_respectmacd       = preset == "Trend Follower" ? true : preset == "All Filters" ? true : respectmacd
-bool eff_respectssl        = preset == "All Filters" ? true : respectssl
-bool eff_respectstc        = preset == "All Filters" ? true : respectstc
-bool eff_respectchaikin    = preset == "All Filters" ? true : respectchaikin
-bool eff_respectvol        = preset == "All Filters" ? true : respectvol
-bool eff_respectwolf       = preset == "All Filters" ? true : respectwolf
-bool eff_respectqqe        = preset == "All Filters" ? true : respectqqe
-bool eff_respecthull       = preset == "All Filters" ? true : respecthull
-bool eff_respectvi         = preset == "All Filters" ? true : respectvi
-bool eff_respectsmc        = preset == "SMC Scalper" ? true : preset == "All Filters" ? true : respectsmc
-bool eff_respectsmc_htf    = preset == "SMC Scalper" ? true : preset == "All Filters" ? true : respectsmc_htf
-bool eff_respectob_mit     = preset == "SMC Scalper" ? true : preset == "All Filters" ? true : respectob_mit
-bool eff_respectfv_ob     = preset == "SMC Scalper" ? true : preset == "All Filters" ? true : respectfv_ob
-bool eff_respectbc         = preset == "Breakout Trader" ? true : preset == "All Filters" ? true : respectbc
-bool eff_respectvix        = preset == "All Filters" ? true : respectvix
-bool eff_respectsqz        = preset == "All Filters" ? true : respectsqz
-bool eff_respectsqz_active = preset == "Breakout Trader" ? true : preset == "All Filters" ? true : respectsqz_active
-bool eff_respectsession    = preset == "All Filters" ? true : respectsession
-bool eff_respecttm         = preset == "All Filters" ? true : respecttm
+// Preset effective variables — compute preset flags once, then use simple or
+is_all_filters   = preset == "All Filters"
+is_smc_scalper   = preset == "SMC Scalper"
+is_trend_follow  = preset == "Trend Follower"
+is_breakout_tr   = preset == "Breakout Trader"
+
+bool eff_respectema        = is_trend_follow or is_all_filters or respectema
+bool eff_respect2ma        = is_trend_follow or is_all_filters or respect2ma
+bool eff_respect3ma        = is_all_filters or respect3ma
+bool eff_respectrf         = is_breakout_tr or is_all_filters or respectrf
+bool eff_respectrqk        = is_all_filters or respectrqk
+bool eff_respectst         = is_trend_follow or is_all_filters or respectst
+bool eff_respectht         = is_all_filters or respectht
+bool eff_respectdonchian   = is_all_filters or respectdonchian
+bool eff_respectroc        = is_all_filters or respectroc
+bool eff_respecttsi        = is_all_filters or respecttsi
+bool eff_respecttdfi       = is_all_filters or respecttdfi
+bool eff_respectmd         = is_all_filters or respectmd
+bool eff_respectdpo        = is_all_filters or respectdpo
+bool eff_respectichi       = is_all_filters or respectichi
+bool eff_respectsuperichi  = is_all_filters or respectsuperichi
+bool eff_respecttrendline_breakout = is_all_filters or respecttrendline_breakout
+bool eff_respectrd         = is_all_filters or respectrd
+bool eff_respecthacolt     = is_all_filters or respecthacolt
+bool eff_respectbx         = is_all_filters or respectbx
+bool eff_respectbbpt       = is_all_filters or respectbbpt
+bool eff_respectvwap       = is_all_filters or respectvwap
+bool eff_respectbbosc      = is_all_filters or respectbbosc
+bool eff_respectce         = is_all_filters or respectce
+bool eff_respectcci        = is_all_filters or respectcci
+bool eff_respectao         = is_all_filters or respectao
+bool eff_respectadx        = is_all_filters or respectadx
+bool eff_respectsar        = is_all_filters or respectsar
+bool eff_respectwae        = is_all_filters or respectwae
+bool eff_respectvo         = is_all_filters or respectvo
+bool eff_respectci         = is_all_filters or respectci
+bool eff_respectdv         = is_all_filters or respectdv
+bool eff_respectstochastic = is_all_filters or respectstochastic
+bool eff_respectrsi        = is_all_filters or respectrsi
+bool eff_respectrsima      = is_all_filters or respectrsima
+bool eff_respectrsilimit   = is_all_filters or respectrsilimit
+bool eff_respectrsimalimit = is_all_filters or respectrsimalimit
+bool eff_respectmacd       = is_trend_follow or is_all_filters or respectmacd
+bool eff_respectssl        = is_all_filters or respectssl
+bool eff_respectstc        = is_all_filters or respectstc
+bool eff_respectchaikin    = is_all_filters or respectchaikin
+bool eff_respectvol        = is_all_filters or respectvol
+bool eff_respectwolf       = is_all_filters or respectwolf
+bool eff_respectqqe        = is_all_filters or respectqqe
+bool eff_respecthull       = is_all_filters or respecthull
+bool eff_respectvi         = is_all_filters or respectvi
+bool eff_respectsmc        = is_smc_scalper or is_all_filters or respectsmc
+bool eff_respectsmc_htf    = is_smc_scalper or is_all_filters or respectsmc_htf
+bool eff_respectob_mit     = is_smc_scalper or is_all_filters or respectob_mit
+bool eff_respectfv_ob      = is_smc_scalper or is_all_filters or respectfv_ob
+bool eff_respectbc         = is_breakout_tr or is_all_filters or respectbc
+bool eff_respectvix        = is_all_filters or respectvix
+bool eff_respectsqz        = is_all_filters or respectsqz
+bool eff_respectsqz_active = is_breakout_tr or is_all_filters or respectsqz_active
+bool eff_respectsession    = is_all_filters or respectsession
+bool eff_respecttm         = is_all_filters or respecttm
 
 
 
@@ -4479,7 +4485,6 @@ longCond2 = false
 shortCond2 = false
 
 
-justcontinue = bool(true)
 
 leadinglongcond = false
 leadingshortcond = false
@@ -4693,129 +4698,237 @@ bool session_conf_long = false
 bool session_conf_short = false
 
 
-longCond := leadinglongcond  and   (eff_respectrf?uprf:justcontinue) and
- (eff_respectadx?adxupcondition:justcontinue)  and (eff_respecttsi?tsi_long:justcontinue) and (eff_respecthacolt?hacolt_long:justcontinue)  and (eff_respectmd?md_long:justcontinue) and (eff_respecttdfi?tdfi_long:justcontinue) and (eff_respectdpo?dpo_long:justcontinue)    and (eff_respectrd? rd_signal:justcontinue)   and (eff_respectci?ci_filter:justcontinue)  and (eff_respectroc?roc_long:justcontinue)     and (eff_respectht?halftrend_long:justcontinue)  and (eff_respectdonchian?donchian_long:justcontinue)   and (eff_respecttrendline_breakout?tb_buysignal:justcontinue) and (eff_respectbbpt?bbpt_long:justcontinue) and (eff_respectrqk?rqkuptrend:justcontinue)  and (eff_respectbx?bx_long:justcontinue)   and (eff_respectbbosc?bbosc_long:justcontinue)   and (eff_respectwae?wae_long:justcontinue)  and (eff_respectce?ce_long:justcontinue)  and (eff_respectssl?ssl_long:justcontinue) and (eff_respect2ma?ema2_long:justcontinue) and (eff_respect3ma?ema3_long:justcontinue) and (eff_respectstochastic?stoch_long:justcontinue) and (eff_respectcci?ccilong:justcontinue) and (eff_respectst?isstup:justcontinue) and (eff_respectrsi?rsiup:justcontinue) and (eff_respectrsimalimit?rsimalimitlong:justcontinue)  and (eff_respectrsilimit?rsilimitlong:justcontinue) and (eff_respectrsima?rsimalong2:justcontinue)  and (eff_respectema?isaboverespectema:justcontinue) and (eff_respectqqe?isqqeabove:justcontinue) and (eff_respectsar?sarup:justcontinue) and
-  (eff_respectvol?longvol:justcontinue) and (eff_respectchaikin?chaikin_long:justcontinue)  and (eff_respectvwap?long_vwap:justcontinue) and (eff_respectvo?vo_long:justcontinue)  and (eff_respectao?ao_long:justcontinue) and (eff_respectsuperichi?superichi_long:justcontinue) and (eff_respectwolf?wolf_long:justcontinue) and (eff_respectichi?ichi_long:justcontinue) and (eff_respectmacd?ismacdup:justcontinue)   and (eff_respecthull?hullup:justcontinue) and (eff_respectvi?vipcondition:justcontinue)   and (eff_respectstc?stcup:justcontinue)  and (eff_respectdv?dvup:justcontinue) and (eff_respectsmc?smc_conf_long:justcontinue) and (eff_respectsmc_htf?smc_htf_conf_long:justcontinue) and (eff_respectob_mit?smc_ob_bear_mitigated:justcontinue) and (eff_respectbc?bc_bullishBreakout:justcontinue) and (eff_respectvix?vix_conf_long:justcontinue) and (eff_respectsqz?sqz_conf_long:justcontinue) and (eff_respectsqz_active?sqz_active_conf_long:justcontinue) and (eff_respectsession?session_conf_long:justcontinue) and (eff_respectfv_ob?fv_ob_conf_long:justcontinue) and (eff_respecttm?tm_conf_long:justcontinue)
+// Confirmation chains — split into intermediate variables to reduce compiler load
+lc1 = not eff_respectrf or uprf
+lc2 = not eff_respectadx or adxupcondition
+lc3 = not eff_respecttsi or tsi_long
+lc4 = not eff_respecthacolt or hacolt_long
+lc5 = not eff_respectmd or md_long
+lc6 = not eff_respecttdfi or tdfi_long
+lc7 = not eff_respectdpo or dpo_long
+lc8 = not eff_respectrd or rd_signal
+lc9 = not eff_respectci or ci_filter
+lc10 = not eff_respectroc or roc_long
+lc11 = not eff_respectht or halftrend_long
+lc12 = not eff_respectdonchian or donchian_long
+lc13 = not eff_respecttrendline_breakout or tb_buysignal
+lc14 = not eff_respectbbpt or bbpt_long
+lc15 = not eff_respectrqk or rqkuptrend
+lc16 = not eff_respectbx or bx_long
+lc17 = not eff_respectbbosc or bbosc_long
+lc18 = not eff_respectwae or wae_long
+lc19 = not eff_respectce or ce_long
+lc20 = not eff_respectssl or ssl_long
+lc21 = not eff_respect2ma or ema2_long
+lc22 = not eff_respect3ma or ema3_long
+lc23 = not eff_respectstochastic or stoch_long
+lc24 = not eff_respectcci or ccilong
+lc25 = not eff_respectst or isstup
+lc26 = not eff_respectrsi or rsiup
+lc27 = not eff_respectrsimalimit or rsimalimitlong
+lc28 = not eff_respectrsilimit or rsilimitlong
+lc29 = not eff_respectrsima or rsimalong2
+lc30 = not eff_respectema or isaboverespectema
+lc31 = not eff_respectqqe or isqqeabove
+lc32 = not eff_respectsar or sarup
+lc33 = not eff_respectvol or longvol
+lc34 = not eff_respectchaikin or chaikin_long
+lc35 = not eff_respectvwap or long_vwap
+lc36 = not eff_respectvo or vo_long
+lc37 = not eff_respectao or ao_long
+lc38 = not eff_respectsuperichi or superichi_long
+lc39 = not eff_respectwolf or wolf_long
+lc40 = not eff_respectichi or ichi_long
+lc41 = not eff_respectmacd or ismacdup
+lc42 = not eff_respecthull or hullup
+lc43 = not eff_respectvi or vipcondition
+lc44 = not eff_respectstc or stcup
+lc45 = not eff_respectdv or dvup
+lc46 = not eff_respectsmc or smc_conf_long
+lc47 = not eff_respectsmc_htf or smc_htf_conf_long
+lc48 = not eff_respectob_mit or smc_ob_bear_mitigated
+lc49 = not eff_respectbc or bc_bullishBreakout
+lc50 = not eff_respectvix or vix_conf_long
+lc51 = not eff_respectsqz or sqz_conf_long
+lc52 = not eff_respectsqz_active or sqz_active_conf_long
+lc53 = not eff_respectsession or session_conf_long
+lc54 = not eff_respectfv_ob or fv_ob_conf_long
+lc55 = not eff_respecttm or tm_conf_long
 
+sc1 = not eff_respectrf or downrf
+sc2 = not eff_respectadx or adxdowncondition
+sc3 = not eff_respecttsi or tsi_short
+sc4 = not eff_respecthacolt or hacolt_short
+sc5 = not eff_respectmd or md_short
+sc6 = not eff_respecttdfi or tdfi_short
+sc7 = not eff_respectdpo or dpo_short
+sc8 = not eff_respectrd or rd_signal
+sc9 = not eff_respectci or ci_filter
+sc10 = not eff_respectroc or roc_short
+sc11 = not eff_respectht or halftrend_short
+sc12 = not eff_respectdonchian or donchian_short
+sc13 = not eff_respecttrendline_breakout or tb_sellsignal
+sc14 = not eff_respectbbpt or bbpt_short
+sc15 = not eff_respectrqk or rqkdowntrend
+sc16 = not eff_respectbx or bx_short
+sc17 = not eff_respectbbosc or bbosc_short
+sc18 = not eff_respectwae or wae_short
+sc19 = not eff_respectce or ce_short
+sc20 = not eff_respectssl or ssl_short
+sc21 = not eff_respect2ma or ema2_short
+sc22 = not eff_respect3ma or ema3_short
+sc23 = not eff_respectstochastic or stoch_short
+sc24 = not eff_respectcci or ccishort
+sc25 = not eff_respectrsimalimit or rsimalimitshort
+sc26 = not eff_respectrsilimit or rsilimitshort
+sc27 = not eff_respectrsima or rsimashort2
+sc28 = not eff_respectst or isstdown
+sc29 = not eff_respectrsi or rsidown
+sc30 = not eff_respectema or isbelowrespectema
+sc31 = not eff_respectqqe or isqqebelow
+sc32 = not eff_respectsar or sardown
+sc33 = not eff_respectvol or shortvol
+sc34 = not eff_respectchaikin or chaikin_short
+sc35 = not eff_respectvwap or short_vwap
+sc36 = not eff_respectvo or vo_short
+sc37 = not eff_respectao or ao_short
+sc38 = not eff_respectsuperichi or superichi_short
+sc39 = not eff_respectwolf or wolf_short
+sc40 = not eff_respectichi or ichi_short
+sc41 = not eff_respectmacd or ismacddown
+sc42 = not eff_respecthull or hulldown
+sc43 = not eff_respectvi or vimcondition
+sc44 = not eff_respectstc or stcdown
+sc45 = not eff_respectdv or dvup
+sc46 = not eff_respectsmc or smc_conf_short
+sc47 = not eff_respectsmc_htf or smc_htf_conf_short
+sc48 = not eff_respectob_mit or smc_ob_bull_mitigated
+sc49 = not eff_respectbc or bc_bearishBreakout
+sc50 = not eff_respectvix or vix_conf_short
+sc51 = not eff_respectsqz or sqz_conf_short
+sc52 = not eff_respectsqz_active or sqz_active_conf_short
+sc53 = not eff_respectsession or session_conf_short
+sc54 = not eff_respectfv_ob or fv_ob_conf_short
+sc55 = not eff_respecttm or tm_conf_short
 
-shortCond := leadingshortcond and   (eff_respectrf?downrf:justcontinue)  and
- (eff_respectadx?adxdowncondition:justcontinue) and (eff_respecttsi?tsi_short:justcontinue)   and (eff_respecthacolt?hacolt_short:justcontinue)  and (eff_respectmd?md_short:justcontinue) and (eff_respecttdfi?tdfi_short:justcontinue)  and (eff_respectdpo?dpo_short:justcontinue)    and (eff_respectrd? rd_signal:justcontinue)   and (eff_respectci?ci_filter:justcontinue)    and (eff_respectroc?roc_short:justcontinue)    and (eff_respectht?halftrend_short:justcontinue)    and (eff_respecttrendline_breakout?tb_sellsignal:justcontinue) and (eff_respectdonchian?donchian_short:justcontinue)  and (eff_respectbbpt?bbpt_short:justcontinue) and (eff_respectrqk?rqkdowntrend:justcontinue)   and (eff_respectbx?bx_short:justcontinue)   and (eff_respectbbosc?bbosc_short:justcontinue)   and (eff_respectwae?wae_short:justcontinue) and (eff_respectce?ce_short:justcontinue)  and (eff_respectssl?ssl_short:justcontinue)  and (eff_respectchaikin?chaikin_short:justcontinue)  and (eff_respect2ma?ema2_short:justcontinue) and (eff_respect3ma?ema3_short:justcontinue)  and (eff_respectstochastic?stoch_short:justcontinue) and (eff_respectcci?ccishort:justcontinue) and (eff_respectrsimalimit?rsimalimitshort:justcontinue)  and (eff_respectrsilimit?rsilimitshort:justcontinue) and (eff_respectrsima?rsimashort2:justcontinue) and (eff_respectst?isstdown:justcontinue) and (eff_respectrsi?rsidown:justcontinue) and (eff_respectema?isbelowrespectema:justcontinue)  and (eff_respectqqe?isqqebelow:justcontinue) and (eff_respectsar?sardown:justcontinue) and
-  (eff_respectvol?shortvol:justcontinue) and (eff_respectvwap?short_vwap:justcontinue)  and (eff_respectvo?vo_short:justcontinue) and (eff_respectao?ao_short:justcontinue)  and (eff_respectsuperichi?superichi_short:justcontinue) and (eff_respectwolf?wolf_short:justcontinue)   and (eff_respectichi?ichi_short:justcontinue)   and (eff_respectmacd?ismacddown:justcontinue) and (eff_respecthull?hulldown:justcontinue) and (eff_respectvi?vimcondition:justcontinue)   and (eff_respectstc?stcdown:justcontinue)  and (eff_respectdv?dvup:justcontinue) and (eff_respectsmc?smc_conf_short:justcontinue) and (eff_respectsmc_htf?smc_htf_conf_short:justcontinue) and (eff_respectob_mit?smc_ob_bull_mitigated:justcontinue) and (eff_respectbc?bc_bearishBreakout:justcontinue) and (eff_respectvix?vix_conf_short:justcontinue) and (eff_respectsqz?sqz_conf_short:justcontinue) and (eff_respectsqz_active?sqz_active_conf_short:justcontinue) and (eff_respectsession?session_conf_short:justcontinue) and (eff_respectfv_ob?fv_ob_conf_short:justcontinue) and (eff_respecttm?tm_conf_short:justcontinue)
+longCond := leadinglongcond and lc1 and lc2 and lc3 and lc4 and lc5 and lc6 and lc7 and lc8 and lc9 and lc10 and lc11 and lc12 and lc13 and lc14 and lc15 and lc16 and lc17 and lc18 and lc19 and lc20 and lc21 and lc22 and lc23 and lc24 and lc25 and lc26 and lc27 and lc28 and lc29 and lc30 and lc31 and lc32 and lc33 and lc34 and lc35 and lc36 and lc37 and lc38 and lc39 and lc40 and lc41 and lc42 and lc43 and lc44 and lc45 and lc46 and lc47 and lc48 and lc49 and lc50 and lc51 and lc52 and lc53 and lc54 and lc55
+
+shortCond := leadingshortcond and sc1 and sc2 and sc3 and sc4 and sc5 and sc6 and sc7 and sc8 and sc9 and sc10 and sc11 and sc12 and sc13 and sc14 and sc15 and sc16 and sc17 and sc18 and sc19 and sc20 and sc21 and sc22 and sc23 and sc24 and sc25 and sc26 and sc27 and sc28 and sc29 and sc30 and sc31 and sc32 and sc33 and sc34 and sc35 and sc36 and sc37 and sc38 and sc39 and sc40 and sc41 and sc42 and sc43 and sc44 and sc45 and sc46 and sc47 and sc48 and sc49 and sc50 and sc51 and sc52 and sc53 and sc54 and sc55
 
 // Signal scoring mode: count passing confirmation filters
 int long_score = 0
 int short_score = 0
 if use_signal_scoring
-    long_score += eff_respectrf and uprf ? 1 : 0
-    long_score += eff_respectadx and adxupcondition ? 1 : 0
-    long_score += eff_respecttsi and tsi_long ? 1 : 0
-    long_score += eff_respecthacolt and hacolt_long ? 1 : 0
-    long_score += eff_respectmd and md_long ? 1 : 0
-    long_score += eff_respecttdfi and tdfi_long ? 1 : 0
-    long_score += eff_respectdpo and dpo_long ? 1 : 0
-    long_score += eff_respectrd and rd_signal ? 1 : 0
-    long_score += eff_respectci and ci_filter ? 1 : 0
-    long_score += eff_respectroc and roc_long ? 1 : 0
-    long_score += eff_respectht and halftrend_long ? 1 : 0
-    long_score += eff_respectdonchian and donchian_long ? 1 : 0
-    long_score += eff_respecttrendline_breakout and tb_buysignal ? 1 : 0
-    long_score += eff_respectbbpt and bbpt_long ? 1 : 0
-    long_score += eff_respectrqk and rqkuptrend ? 1 : 0
-    long_score += eff_respectbx and bx_long ? 1 : 0
-    long_score += eff_respectbbosc and bbosc_long ? 1 : 0
-    long_score += eff_respectwae and wae_long ? 1 : 0
-    long_score += eff_respectce and ce_long ? 1 : 0
-    long_score += eff_respectssl and ssl_long ? 1 : 0
-    long_score += eff_respect2ma and ema2_long ? 1 : 0
-    long_score += eff_respect3ma and ema3_long ? 1 : 0
-    long_score += eff_respectstochastic and stoch_long ? 1 : 0
-    long_score += eff_respectcci and ccilong ? 1 : 0
-    long_score += eff_respectst and isstup ? 1 : 0
-    long_score += eff_respectrsi and rsiup ? 1 : 0
-    long_score += eff_respectrsimalimit and rsimalimitlong ? 1 : 0
-    long_score += eff_respectrsilimit and rsilimitlong ? 1 : 0
-    long_score += eff_respectrsima and rsimalong2 ? 1 : 0
-    long_score += eff_respectema and isaboverespectema ? 1 : 0
-    long_score += eff_respectqqe and isqqeabove ? 1 : 0
-    long_score += eff_respectsar and sarup ? 1 : 0
-    long_score += eff_respectvol and longvol ? 1 : 0
-    long_score += eff_respectchaikin and chaikin_long ? 1 : 0
-    long_score += eff_respectvwap and long_vwap ? 1 : 0
-    long_score += eff_respectvo and vo_long ? 1 : 0
-    long_score += eff_respectao and ao_long ? 1 : 0
-    long_score += eff_respectsuperichi and superichi_long ? 1 : 0
-    long_score += eff_respectwolf and wolf_long ? 1 : 0
-    long_score += eff_respectichi and ichi_long ? 1 : 0
-    long_score += eff_respectmacd and ismacdup ? 1 : 0
-    long_score += eff_respecthull and hullup ? 1 : 0
-    long_score += eff_respectvi and vipcondition ? 1 : 0
-    long_score += eff_respectstc and stcup ? 1 : 0
-    long_score += eff_respectdv and dvup ? 1 : 0
-    long_score += eff_respectsmc and smc_conf_long ? 1 : 0
-    long_score += eff_respectsmc_htf and smc_htf_conf_long ? 1 : 0
-    long_score += eff_respectob_mit and smc_ob_bear_mitigated ? 1 : 0
-    long_score += eff_respectbc and bc_bullishBreakout ? 1 : 0
-    long_score += eff_respectvix and vix_conf_long ? 1 : 0
-    long_score += eff_respectsqz and sqz_conf_long ? 1 : 0
-    long_score += eff_respectsqz_active and sqz_active_conf_long ? 1 : 0
-    long_score += eff_respectsession and session_conf_long ? 1 : 0
-    long_score += eff_respectfv_ob and fv_ob_conf_long ? 1 : 0
-    long_score += eff_respecttm and tm_conf_long ? 1 : 0
+    long_score += (eff_respectrf and uprf) ? 1 : 0
+    long_score += (eff_respectadx and adxupcondition) ? 1 : 0
+    long_score += (eff_respecttsi and tsi_long) ? 1 : 0
+    long_score += (eff_respecthacolt and hacolt_long) ? 1 : 0
+    long_score += (eff_respectmd and md_long) ? 1 : 0
+    long_score += (eff_respecttdfi and tdfi_long) ? 1 : 0
+    long_score += (eff_respectdpo and dpo_long) ? 1 : 0
+    long_score += (eff_respectrd and rd_signal) ? 1 : 0
+    long_score += (eff_respectci and ci_filter) ? 1 : 0
+    long_score += (eff_respectroc and roc_long) ? 1 : 0
+    long_score += (eff_respectht and halftrend_long) ? 1 : 0
+    long_score += (eff_respectdonchian and donchian_long) ? 1 : 0
+    long_score += (eff_respecttrendline_breakout and tb_buysignal) ? 1 : 0
+    long_score += (eff_respectbbpt and bbpt_long) ? 1 : 0
+    long_score += (eff_respectrqk and rqkuptrend) ? 1 : 0
+    long_score += (eff_respectbx and bx_long) ? 1 : 0
+    long_score += (eff_respectbbosc and bbosc_long) ? 1 : 0
+    long_score += (eff_respectwae and wae_long) ? 1 : 0
+    long_score += (eff_respectce and ce_long) ? 1 : 0
+    long_score += (eff_respectssl and ssl_long) ? 1 : 0
+    long_score += (eff_respect2ma and ema2_long) ? 1 : 0
+    long_score += (eff_respect3ma and ema3_long) ? 1 : 0
+    long_score += (eff_respectstochastic and stoch_long) ? 1 : 0
+    long_score += (eff_respectcci and ccilong) ? 1 : 0
+    long_score += (eff_respectst and isstup) ? 1 : 0
+    long_score += (eff_respectrsi and rsiup) ? 1 : 0
+    long_score += (eff_respectrsimalimit and rsimalimitlong) ? 1 : 0
+    long_score += (eff_respectrsilimit and rsilimitlong) ? 1 : 0
+    long_score += (eff_respectrsima and rsimalong2) ? 1 : 0
+    long_score += (eff_respectema and isaboverespectema) ? 1 : 0
+    long_score += (eff_respectqqe and isqqeabove) ? 1 : 0
+    long_score += (eff_respectsar and sarup) ? 1 : 0
+    long_score += (eff_respectvol and longvol) ? 1 : 0
+    long_score += (eff_respectchaikin and chaikin_long) ? 1 : 0
+    long_score += (eff_respectvwap and long_vwap) ? 1 : 0
+    long_score += (eff_respectvo and vo_long) ? 1 : 0
+    long_score += (eff_respectao and ao_long) ? 1 : 0
+    long_score += (eff_respectsuperichi and superichi_long) ? 1 : 0
+    long_score += (eff_respectwolf and wolf_long) ? 1 : 0
+    long_score += (eff_respectichi and ichi_long) ? 1 : 0
+    long_score += (eff_respectmacd and ismacdup) ? 1 : 0
+    long_score += (eff_respecthull and hullup) ? 1 : 0
+    long_score += (eff_respectvi and vipcondition) ? 1 : 0
+    long_score += (eff_respectstc and stcup) ? 1 : 0
+    long_score += (eff_respectdv and dvup) ? 1 : 0
+    long_score += (eff_respectsmc and smc_conf_long) ? 1 : 0
+    long_score += (eff_respectsmc_htf and smc_htf_conf_long) ? 1 : 0
+    long_score += (eff_respectob_mit and smc_ob_bear_mitigated) ? 1 : 0
+    long_score += (eff_respectbc and bc_bullishBreakout) ? 1 : 0
+    long_score += (eff_respectvix and vix_conf_long) ? 1 : 0
+    long_score += (eff_respectsqz and sqz_conf_long) ? 1 : 0
+    long_score += (eff_respectsqz_active and sqz_active_conf_long) ? 1 : 0
+    long_score += (eff_respectsession and session_conf_long) ? 1 : 0
+    long_score += (eff_respectfv_ob and fv_ob_conf_long) ? 1 : 0
+    long_score += (eff_respecttm and tm_conf_long) ? 1 : 0
 
-    short_score += eff_respectrf and downrf ? 1 : 0
-    short_score += eff_respectadx and adxdowncondition ? 1 : 0
-    short_score += eff_respecttsi and tsi_short ? 1 : 0
-    short_score += eff_respecthacolt and hacolt_short ? 1 : 0
-    short_score += eff_respectmd and md_short ? 1 : 0
-    short_score += eff_respecttdfi and tdfi_short ? 1 : 0
-    short_score += eff_respectdpo and dpo_short ? 1 : 0
-    short_score += eff_respectrd and rd_signal ? 1 : 0
-    short_score += eff_respectci and ci_filter ? 1 : 0
-    short_score += eff_respectroc and roc_short ? 1 : 0
-    short_score += eff_respectht and halftrend_short ? 1 : 0
-    short_score += eff_respectdonchian and donchian_short ? 1 : 0
-    short_score += eff_respecttrendline_breakout and tb_sellsignal ? 1 : 0
-    short_score += eff_respectbbpt and bbpt_short ? 1 : 0
-    short_score += eff_respectrqk and rqkdowntrend ? 1 : 0
-    short_score += eff_respectbx and bx_short ? 1 : 0
-    short_score += eff_respectbbosc and bbosc_short ? 1 : 0
-    short_score += eff_respectwae and wae_short ? 1 : 0
-    short_score += eff_respectce and ce_short ? 1 : 0
-    short_score += eff_respectssl and ssl_short ? 1 : 0
-    short_score += eff_respect2ma and ema2_short ? 1 : 0
-    short_score += eff_respect3ma and ema3_short ? 1 : 0
-    short_score += eff_respectstochastic and stoch_short ? 1 : 0
-    short_score += eff_respectcci and ccishort ? 1 : 0
-    short_score += eff_respectrsimalimit and rsimalimitshort ? 1 : 0
-    short_score += eff_respectrsilimit and rsilimitshort ? 1 : 0
-    short_score += eff_respectrsima and rsimashort2 ? 1 : 0
-    short_score += eff_respectst and isstdown ? 1 : 0
-    short_score += eff_respectrsi and rsidown ? 1 : 0
-    short_score += eff_respectema and isbelowrespectema ? 1 : 0
-    short_score += eff_respectqqe and isqqebelow ? 1 : 0
-    short_score += eff_respectsar and sardown ? 1 : 0
-    short_score += eff_respectvol and shortvol ? 1 : 0
-    short_score += eff_respectchaikin and chaikin_short ? 1 : 0
-    short_score += eff_respectvwap and short_vwap ? 1 : 0
-    short_score += eff_respectvo and vo_short ? 1 : 0
-    short_score += eff_respectao and ao_short ? 1 : 0
-    short_score += eff_respectsuperichi and superichi_short ? 1 : 0
-    short_score += eff_respectwolf and wolf_short ? 1 : 0
-    short_score += eff_respectichi and ichi_short ? 1 : 0
-    short_score += eff_respectmacd and ismacddown ? 1 : 0
-    short_score += eff_respecthull and hulldown ? 1 : 0
-    short_score += eff_respectvi and vimcondition ? 1 : 0
-    short_score += eff_respectstc and stcdown ? 1 : 0
-    short_score += eff_respectdv and dvup ? 1 : 0
-    short_score += eff_respectsmc and smc_conf_short ? 1 : 0
-    short_score += eff_respectsmc_htf and smc_htf_conf_short ? 1 : 0
-    short_score += eff_respectob_mit and smc_ob_bull_mitigated ? 1 : 0
-    short_score += eff_respectbc and bc_bearishBreakout ? 1 : 0
-    short_score += eff_respectvix and vix_conf_short ? 1 : 0
-    short_score += eff_respectsqz and sqz_conf_short ? 1 : 0
-    short_score += eff_respectsqz_active and sqz_active_conf_short ? 1 : 0
-    short_score += eff_respectsession and session_conf_short ? 1 : 0
-    short_score += eff_respectfv_ob and fv_ob_conf_short ? 1 : 0
+    short_score += (eff_respectrf and downrf) ? 1 : 0
+    short_score += (eff_respectadx and adxdowncondition) ? 1 : 0
+    short_score += (eff_respecttsi and tsi_short) ? 1 : 0
+    short_score += (eff_respecthacolt and hacolt_short) ? 1 : 0
+    short_score += (eff_respectmd and md_short) ? 1 : 0
+    short_score += (eff_respecttdfi and tdfi_short) ? 1 : 0
+    short_score += (eff_respectdpo and dpo_short) ? 1 : 0
+    short_score += (eff_respectrd and rd_signal) ? 1 : 0
+    short_score += (eff_respectci and ci_filter) ? 1 : 0
+    short_score += (eff_respectroc and roc_short) ? 1 : 0
+    short_score += (eff_respectht and halftrend_short) ? 1 : 0
+    short_score += (eff_respectdonchian and donchian_short) ? 1 : 0
+    short_score += (eff_respecttrendline_breakout and tb_sellsignal) ? 1 : 0
+    short_score += (eff_respectbbpt and bbpt_short) ? 1 : 0
+    short_score += (eff_respectrqk and rqkdowntrend) ? 1 : 0
+    short_score += (eff_respectbx and bx_short) ? 1 : 0
+    short_score += (eff_respectbbosc and bbosc_short) ? 1 : 0
+    short_score += (eff_respectwae and wae_short) ? 1 : 0
+    short_score += (eff_respectce and ce_short) ? 1 : 0
+    short_score += (eff_respectssl and ssl_short) ? 1 : 0
+    short_score += (eff_respect2ma and ema2_short) ? 1 : 0
+    short_score += (eff_respect3ma and ema3_short) ? 1 : 0
+    short_score += (eff_respectstochastic and stoch_short) ? 1 : 0
+    short_score += (eff_respectcci and ccishort) ? 1 : 0
+    short_score += (eff_respectrsimalimit and rsimalimitshort) ? 1 : 0
+    short_score += (eff_respectrsilimit and rsilimitshort) ? 1 : 0
+    short_score += (eff_respectrsima and rsimashort2) ? 1 : 0
+    short_score += (eff_respectst and isstdown) ? 1 : 0
+    short_score += (eff_respectrsi and rsidown) ? 1 : 0
+    short_score += (eff_respectema and isbelowrespectema) ? 1 : 0
+    short_score += (eff_respectqqe and isqqebelow) ? 1 : 0
+    short_score += (eff_respectsar and sardown) ? 1 : 0
+    short_score += (eff_respectvol and shortvol) ? 1 : 0
+    short_score += (eff_respectchaikin and chaikin_short) ? 1 : 0
+    short_score += (eff_respectvwap and short_vwap) ? 1 : 0
+    short_score += (eff_respectvo and vo_short) ? 1 : 0
+    short_score += (eff_respectao and ao_short) ? 1 : 0
+    short_score += (eff_respectsuperichi and superichi_short) ? 1 : 0
+    short_score += (eff_respectwolf and wolf_short) ? 1 : 0
+    short_score += (eff_respectichi and ichi_short) ? 1 : 0
+    short_score += (eff_respectmacd and ismacddown) ? 1 : 0
+    short_score += (eff_respecthull and hulldown) ? 1 : 0
+    short_score += (eff_respectvi and vimcondition) ? 1 : 0
+    short_score += (eff_respectstc and stcdown) ? 1 : 0
+    short_score += (eff_respectdv and dvup) ? 1 : 0
+    short_score += (eff_respectsmc and smc_conf_short) ? 1 : 0
+    short_score += (eff_respectsmc_htf and smc_htf_conf_short) ? 1 : 0
+    short_score += (eff_respectob_mit and smc_ob_bull_mitigated) ? 1 : 0
+    short_score += (eff_respectbc and bc_bearishBreakout) ? 1 : 0
+    short_score += (eff_respectvix and vix_conf_short) ? 1 : 0
+    short_score += (eff_respectsqz and sqz_conf_short) ? 1 : 0
+    short_score += (eff_respectsqz_active and sqz_active_conf_short) ? 1 : 0
+    short_score += (eff_respectsession and session_conf_short) ? 1 : 0
+    short_score += (eff_respectfv_ob and fv_ob_conf_short) ? 1 : 0
     short_score += eff_respecttm and tm_conf_short ? 1 : 0
 
     longCond := leadinglongcond and long_score >= signal_score_threshold
