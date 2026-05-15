@@ -4055,8 +4055,10 @@ smc_drawEqualHL(smc_pivot p_ivot, float level, int size, bool equalHigh) =>
 smc_storeOB(smc_pivot p_ivot, bool internal, int bias) =>
     if (not internal and smc_show_ob) or (internal and smc_show_ob)
         float ph = bias == SMC_BEARISH ? smc_parsedHigh : smc_parsedLow
-        int lookback = bar_index - p_ivot.barIndex
-        float best = bias == SMC_BEARISH ? ta.highest(high, lookback) : ta.lowest(low, lookback)
+        int ob_lookback = bar_index - p_ivot.barIndex
+        float ob_high = ta.highest(high, ob_lookback)
+        float ob_low = ta.lowest(low, ob_lookback)
+        float best = bias == SMC_BEARISH ? ob_high : ob_low
         smc_orderBlock ob = smc_orderBlock.new(high, low, time, bias)
         array<smc_orderBlock> obs = internal ? smc_internalOBs : smc_swingOBs
         if obs.size() >= 50
@@ -4109,9 +4111,9 @@ smc_drawFVGs() =>
     fvgBullColor = smc_style == "Monochrome" ? color.new(SMC_MONO_BULL, 70) : color.new(#00ff68, 70)
     fvgBearColor = smc_style == "Monochrome" ? color.new(SMC_MONO_BEAR, 70) : color.new(#ff0008, 70)
     if bullishFVG
-        smc_fvgs.unshift(smc_fairValueGap.new(low, high[2], SMC_BULLISH, box.new(chart.point.new(time[1], na, low), chart.point.new(time, na, math.avg(low, high[2])), xloc.bar_time, border_color=fvgBullColor, bgcolor=fvgBullColor), box.new(chart.point.new(time[1], na, math.avg(low, high[2])), chart.point.new(time, na, high[2]), xloc.bar_time, border_color=fvgBullColor, bgcolor=fvgBullColor)))
+        smc_fvgs.unshift(smc_fairValueGap.new(low, high[2], SMC_BULLISH, box.new(chart.point.new(time[1], na, low), chart.point.new(time, na, math.avg(low, high[2])), xloc=xloc.bar_time, border_color=fvgBullColor, bgcolor=fvgBullColor), box.new(chart.point.new(time[1], na, math.avg(low, high[2])), chart.point.new(time, na, high[2]), xloc=xloc.bar_time, border_color=fvgBullColor, bgcolor=fvgBullColor)))
     if bearishFVG
-        smc_fvgs.unshift(smc_fairValueGap.new(high, low[2], SMC_BEARISH, box.new(chart.point.new(time[1], na, high), chart.point.new(time, na, math.avg(high, low[2])), xloc.bar_time, border_color=fvgBearColor, bgcolor=fvgBearColor), box.new(chart.point.new(time[1], na, math.avg(high, low[2])), chart.point.new(time, na, low[2]), xloc.bar_time, border_color=fvgBearColor, bgcolor=fvgBearColor)))
+        smc_fvgs.unshift(smc_fairValueGap.new(high, low[2], SMC_BEARISH, box.new(chart.point.new(time[1], na, high), chart.point.new(time, na, math.avg(high, low[2])), xloc=xloc.bar_time, border_color=fvgBearColor, bgcolor=fvgBearColor), box.new(chart.point.new(time[1], na, math.avg(high, low[2])), chart.point.new(time, na, low[2]), xloc=xloc.bar_time, border_color=fvgBearColor, bgcolor=fvgBearColor)))
 
 smc_getStructure(int size, bool equalHL = false, bool internal = false) =>
     currentLeg = smc_leg(size)
