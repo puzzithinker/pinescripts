@@ -119,7 +119,6 @@ signal_score_threshold = input.int(3, "Min Score", minval=1, maxval=10, group=se
 showsignal = input.bool (true, "Show Long/Short Signal", group=setup_group,inline='showsignal',tooltip="Option to turn on/off the Long/Short signal shown on the chart. by default it will print Long/ Short signal on the chart.")
 
 showdashboard = input.bool (true, "Show Dashboard", group=setup_group,inline='dashboard')
-show_detailed_dashboard = input.bool(false, "Show Indicator Status", group=setup_group, inline='dashboard', tooltip="Show a separate table with status of SMC, Breakout Channels, Vix Fix, Squeeze, EMA, and STC")
 string preset = input.string("Custom", "Preset", group=setup_group, options=["Custom", "SMC Scalper", "Trend Follower", "Breakout Trader", "All Filters"], tooltip="Pre-configured setups. 'Custom' uses your individual settings. Other presets override confirmation filters and leading indicator.")
 string i_tab1Ypos = input.string('bottom', 'Dashboard Position',group=setup_group, inline='dashboard2', options=['top', 'middle', 'bottom'])
 string i_tab1Xpos = input.string('right', '', inline='dashboard2', group=setup_group,options=['left', 'center', 'right'])
@@ -4698,241 +4697,294 @@ bool session_conf_long = false
 bool session_conf_short = false
 
 
-// Confirmation chains — split into intermediate variables to reduce compiler load
-lc1 = not eff_respectrf or uprf
-lc2 = not eff_respectadx or adxupcondition
-lc3 = not eff_respecttsi or tsi_long
-lc4 = not eff_respecthacolt or hacolt_long
-lc5 = not eff_respectmd or md_long
-lc6 = not eff_respecttdfi or tdfi_long
-lc7 = not eff_respectdpo or dpo_long
-lc8 = not eff_respectrd or rd_signal
-lc9 = not eff_respectci or ci_filter
-lc10 = not eff_respectroc or roc_long
-lc11 = not eff_respectht or halftrend_long
-lc12 = not eff_respectdonchian or donchian_long
-lc13 = not eff_respecttrendline_breakout or tb_buysignal
-lc14 = not eff_respectbbpt or bbpt_long
-lc15 = not eff_respectrqk or rqkuptrend
-lc16 = not eff_respectbx or bx_long
-lc17 = not eff_respectbbosc or bbosc_long
-lc18 = not eff_respectwae or wae_long
-lc19 = not eff_respectce or ce_long
-lc20 = not eff_respectssl or ssl_long
-lc21 = not eff_respect2ma or ema2_long
-lc22 = not eff_respect3ma or ema3_long
-lc23 = not eff_respectstochastic or stoch_long
-lc24 = not eff_respectcci or ccilong
-lc25 = not eff_respectst or isstup
-lc26 = not eff_respectrsi or rsiup
-lc27 = not eff_respectrsimalimit or rsimalimitlong
-lc28 = not eff_respectrsilimit or rsilimitlong
-lc29 = not eff_respectrsima or rsimalong2
-lc30 = not eff_respectema or isaboverespectema
-lc31 = not eff_respectqqe or isqqeabove
-lc32 = not eff_respectsar or sarup
-lc33 = not eff_respectvol or longvol
-lc34 = not eff_respectchaikin or chaikin_long
-lc35 = not eff_respectvwap or long_vwap
-lc36 = not eff_respectvo or vo_long
-lc37 = not eff_respectao or ao_long
-lc38 = not eff_respectsuperichi or superichi_long
-lc39 = not eff_respectwolf or wolf_long
-lc40 = not eff_respectichi or ichi_long
-lc41 = not eff_respectmacd or ismacdup
-lc42 = not eff_respecthull or hullup
-lc43 = not eff_respectvi or vipcondition
-lc44 = not eff_respectstc or stcup
-lc45 = not eff_respectdv or dvup
-lc46 = not eff_respectsmc or smc_conf_long
-lc47 = not eff_respectsmc_htf or smc_htf_conf_long
-lc48 = not eff_respectob_mit or smc_ob_bear_mitigated
-lc49 = not eff_respectbc or bc_bullishBreakout
-lc50 = not eff_respectvix or vix_conf_long
-lc51 = not eff_respectsqz or sqz_conf_long
-lc52 = not eff_respectsqz_active or sqz_active_conf_long
-lc53 = not eff_respectsession or session_conf_long
-lc54 = not eff_respectfv_ob or fv_ob_conf_long
-lc55 = not eff_respecttm or tm_conf_long
-
-sc1 = not eff_respectrf or downrf
-sc2 = not eff_respectadx or adxdowncondition
-sc3 = not eff_respecttsi or tsi_short
-sc4 = not eff_respecthacolt or hacolt_short
-sc5 = not eff_respectmd or md_short
-sc6 = not eff_respecttdfi or tdfi_short
-sc7 = not eff_respectdpo or dpo_short
-sc8 = not eff_respectrd or rd_signal
-sc9 = not eff_respectci or ci_filter
-sc10 = not eff_respectroc or roc_short
-sc11 = not eff_respectht or halftrend_short
-sc12 = not eff_respectdonchian or donchian_short
-sc13 = not eff_respecttrendline_breakout or tb_sellsignal
-sc14 = not eff_respectbbpt or bbpt_short
-sc15 = not eff_respectrqk or rqkdowntrend
-sc16 = not eff_respectbx or bx_short
-sc17 = not eff_respectbbosc or bbosc_short
-sc18 = not eff_respectwae or wae_short
-sc19 = not eff_respectce or ce_short
-sc20 = not eff_respectssl or ssl_short
-sc21 = not eff_respect2ma or ema2_short
-sc22 = not eff_respect3ma or ema3_short
-sc23 = not eff_respectstochastic or stoch_short
-sc24 = not eff_respectcci or ccishort
-sc25 = not eff_respectrsimalimit or rsimalimitshort
-sc26 = not eff_respectrsilimit or rsilimitshort
-sc27 = not eff_respectrsima or rsimashort2
-sc28 = not eff_respectst or isstdown
-sc29 = not eff_respectrsi or rsidown
-sc30 = not eff_respectema or isbelowrespectema
-sc31 = not eff_respectqqe or isqqebelow
-sc32 = not eff_respectsar or sardown
-sc33 = not eff_respectvol or shortvol
-sc34 = not eff_respectchaikin or chaikin_short
-sc35 = not eff_respectvwap or short_vwap
-sc36 = not eff_respectvo or vo_short
-sc37 = not eff_respectao or ao_short
-sc38 = not eff_respectsuperichi or superichi_short
-sc39 = not eff_respectwolf or wolf_short
-sc40 = not eff_respectichi or ichi_short
-sc41 = not eff_respectmacd or ismacddown
-sc42 = not eff_respecthull or hulldown
-sc43 = not eff_respectvi or vimcondition
-sc44 = not eff_respectstc or stcdown
-sc45 = not eff_respectdv or dvup
-sc46 = not eff_respectsmc or smc_conf_short
-sc47 = not eff_respectsmc_htf or smc_htf_conf_short
-sc48 = not eff_respectob_mit or smc_ob_bull_mitigated
-sc49 = not eff_respectbc or bc_bearishBreakout
-sc50 = not eff_respectvix or vix_conf_short
-sc51 = not eff_respectsqz or sqz_conf_short
-sc52 = not eff_respectsqz_active or sqz_active_conf_short
-sc53 = not eff_respectsession or session_conf_short
-sc54 = not eff_respectfv_ob or fv_ob_conf_short
-sc55 = not eff_respecttm or tm_conf_short
-
-longCond := leadinglongcond and lc1 and lc2 and lc3 and lc4 and lc5 and lc6 and lc7 and lc8 and lc9 and lc10 and lc11 and lc12 and lc13 and lc14 and lc15 and lc16 and lc17 and lc18 and lc19 and lc20 and lc21 and lc22 and lc23 and lc24 and lc25 and lc26 and lc27 and lc28 and lc29 and lc30 and lc31 and lc32 and lc33 and lc34 and lc35 and lc36 and lc37 and lc38 and lc39 and lc40 and lc41 and lc42 and lc43 and lc44 and lc45 and lc46 and lc47 and lc48 and lc49 and lc50 and lc51 and lc52 and lc53 and lc54 and lc55
-
-shortCond := leadingshortcond and sc1 and sc2 and sc3 and sc4 and sc5 and sc6 and sc7 and sc8 and sc9 and sc10 and sc11 and sc12 and sc13 and sc14 and sc15 and sc16 and sc17 and sc18 and sc19 and sc20 and sc21 and sc22 and sc23 and sc24 and sc25 and sc26 and sc27 and sc28 and sc29 and sc30 and sc31 and sc32 and sc33 and sc34 and sc35 and sc36 and sc37 and sc38 and sc39 and sc40 and sc41 and sc42 and sc43 and sc44 and sc45 and sc46 and sc47 and sc48 and sc49 and sc50 and sc51 and sc52 and sc53 and sc54 and sc55
-
-// Signal scoring mode: count passing confirmation filters
+// Confirmation chains and scoring — compact accumulator approach
+bool longOk = leadinglongcond
+bool shortOk = leadingshortcond
 int long_score = 0
 int short_score = 0
+
+longOk := longOk and (not eff_respectrf or uprf)
+shortOk := shortOk and (not eff_respectrf or downrf)
+long_score += eff_respectrf and uprf ? 1 : 0
+short_score += eff_respectrf and downrf ? 1 : 0
+
+longOk := longOk and (not eff_respectadx or adxupcondition)
+shortOk := shortOk and (not eff_respectadx or adxdowncondition)
+long_score += eff_respectadx and adxupcondition ? 1 : 0
+short_score += eff_respectadx and adxdowncondition ? 1 : 0
+
+longOk := longOk and (not eff_respecttsi or tsi_long)
+shortOk := shortOk and (not eff_respecttsi or tsi_short)
+long_score += eff_respecttsi and tsi_long ? 1 : 0
+short_score += eff_respecttsi and tsi_short ? 1 : 0
+
+longOk := longOk and (not eff_respecthacolt or hacolt_long)
+shortOk := shortOk and (not eff_respecthacolt or hacolt_short)
+long_score += eff_respecthacolt and hacolt_long ? 1 : 0
+short_score += eff_respecthacolt and hacolt_short ? 1 : 0
+
+longOk := longOk and (not eff_respectmd or md_long)
+shortOk := shortOk and (not eff_respectmd or md_short)
+long_score += eff_respectmd and md_long ? 1 : 0
+short_score += eff_respectmd and md_short ? 1 : 0
+
+longOk := longOk and (not eff_respecttdfi or tdfi_long)
+shortOk := shortOk and (not eff_respecttdfi or tdfi_short)
+long_score += eff_respecttdfi and tdfi_long ? 1 : 0
+short_score += eff_respecttdfi and tdfi_short ? 1 : 0
+
+longOk := longOk and (not eff_respectdpo or dpo_long)
+shortOk := shortOk and (not eff_respectdpo or dpo_short)
+long_score += eff_respectdpo and dpo_long ? 1 : 0
+short_score += eff_respectdpo and dpo_short ? 1 : 0
+
+longOk := longOk and (not eff_respectrd or rd_signal)
+shortOk := shortOk and (not eff_respectrd or rd_signal)
+long_score += eff_respectrd and rd_signal ? 1 : 0
+short_score += eff_respectrd and rd_signal ? 1 : 0
+
+longOk := longOk and (not eff_respectci or ci_filter)
+shortOk := shortOk and (not eff_respectci or ci_filter)
+long_score += eff_respectci and ci_filter ? 1 : 0
+short_score += eff_respectci and ci_filter ? 1 : 0
+
+longOk := longOk and (not eff_respectroc or roc_long)
+shortOk := shortOk and (not eff_respectroc or roc_short)
+long_score += eff_respectroc and roc_long ? 1 : 0
+short_score += eff_respectroc and roc_short ? 1 : 0
+
+longOk := longOk and (not eff_respectht or halftrend_long)
+shortOk := shortOk and (not eff_respectht or halftrend_short)
+long_score += eff_respectht and halftrend_long ? 1 : 0
+short_score += eff_respectht and halftrend_short ? 1 : 0
+
+longOk := longOk and (not eff_respectdonchian or donchian_long)
+shortOk := shortOk and (not eff_respectdonchian or donchian_short)
+long_score += eff_respectdonchian and donchian_long ? 1 : 0
+short_score += eff_respectdonchian and donchian_short ? 1 : 0
+
+longOk := longOk and (not eff_respecttrendline_breakout or tb_buysignal)
+shortOk := shortOk and (not eff_respecttrendline_breakout or tb_sellsignal)
+long_score += eff_respecttrendline_breakout and tb_buysignal ? 1 : 0
+short_score += eff_respecttrendline_breakout and tb_sellsignal ? 1 : 0
+
+longOk := longOk and (not eff_respectbbpt or bbpt_long)
+shortOk := shortOk and (not eff_respectbbpt or bbpt_short)
+long_score += eff_respectbbpt and bbpt_long ? 1 : 0
+short_score += eff_respectbbpt and bbpt_short ? 1 : 0
+
+longOk := longOk and (not eff_respectrqk or rqkuptrend)
+shortOk := shortOk and (not eff_respectrqk or rqkdowntrend)
+long_score += eff_respectrqk and rqkuptrend ? 1 : 0
+short_score += eff_respectrqk and rqkdowntrend ? 1 : 0
+
+longOk := longOk and (not eff_respectbx or bx_long)
+shortOk := shortOk and (not eff_respectbx or bx_short)
+long_score += eff_respectbx and bx_long ? 1 : 0
+short_score += eff_respectbx and bx_short ? 1 : 0
+
+longOk := longOk and (not eff_respectbbosc or bbosc_long)
+shortOk := shortOk and (not eff_respectbbosc or bbosc_short)
+long_score += eff_respectbbosc and bbosc_long ? 1 : 0
+short_score += eff_respectbbosc and bbosc_short ? 1 : 0
+
+longOk := longOk and (not eff_respectwae or wae_long)
+shortOk := shortOk and (not eff_respectwae or wae_short)
+long_score += eff_respectwae and wae_long ? 1 : 0
+short_score += eff_respectwae and wae_short ? 1 : 0
+
+longOk := longOk and (not eff_respectce or ce_long)
+shortOk := shortOk and (not eff_respectce or ce_short)
+long_score += eff_respectce and ce_long ? 1 : 0
+short_score += eff_respectce and ce_short ? 1 : 0
+
+longOk := longOk and (not eff_respectssl or ssl_long)
+shortOk := shortOk and (not eff_respectssl or ssl_short)
+long_score += eff_respectssl and ssl_long ? 1 : 0
+short_score += eff_respectssl and ssl_short ? 1 : 0
+
+longOk := longOk and (not eff_respect2ma or ema2_long)
+shortOk := shortOk and (not eff_respect2ma or ema2_short)
+long_score += eff_respect2ma and ema2_long ? 1 : 0
+short_score += eff_respect2ma and ema2_short ? 1 : 0
+
+longOk := longOk and (not eff_respect3ma or ema3_long)
+shortOk := shortOk and (not eff_respect3ma or ema3_short)
+long_score += eff_respect3ma and ema3_long ? 1 : 0
+short_score += eff_respect3ma and ema3_short ? 1 : 0
+
+longOk := longOk and (not eff_respectstochastic or stoch_long)
+shortOk := shortOk and (not eff_respectstochastic or stoch_short)
+long_score += eff_respectstochastic and stoch_long ? 1 : 0
+short_score += eff_respectstochastic and stoch_short ? 1 : 0
+
+longOk := longOk and (not eff_respectcci or ccilong)
+shortOk := shortOk and (not eff_respectcci or ccishort)
+long_score += eff_respectcci and ccilong ? 1 : 0
+short_score += eff_respectcci and ccishort ? 1 : 0
+
+longOk := longOk and (not eff_respectst or isstup)
+shortOk := shortOk and (not eff_respectst or isstdown)
+long_score += eff_respectst and isstup ? 1 : 0
+short_score += eff_respectst and isstdown ? 1 : 0
+
+longOk := longOk and (not eff_respectrsi or rsiup)
+shortOk := shortOk and (not eff_respectrsi or rsidown)
+long_score += eff_respectrsi and rsiup ? 1 : 0
+short_score += eff_respectrsi and rsidown ? 1 : 0
+
+longOk := longOk and (not eff_respectrsimalimit or rsimalimitlong)
+shortOk := shortOk and (not eff_respectrsimalimit or rsimalimitshort)
+long_score += eff_respectrsimalimit and rsimalimitlong ? 1 : 0
+short_score += eff_respectrsimalimit and rsimalimitshort ? 1 : 0
+
+longOk := longOk and (not eff_respectrsilimit or rsilimitlong)
+shortOk := shortOk and (not eff_respectrsilimit or rsilimitshort)
+long_score += eff_respectrsilimit and rsilimitlong ? 1 : 0
+short_score += eff_respectrsilimit and rsilimitshort ? 1 : 0
+
+longOk := longOk and (not eff_respectrsima or rsimalong2)
+shortOk := shortOk and (not eff_respectrsima or rsimashort2)
+long_score += eff_respectrsima and rsimalong2 ? 1 : 0
+short_score += eff_respectrsima and rsimashort2 ? 1 : 0
+
+longOk := longOk and (not eff_respectema or isaboverespectema)
+shortOk := shortOk and (not eff_respectema or isbelowrespectema)
+long_score += eff_respectema and isaboverespectema ? 1 : 0
+short_score += eff_respectema and isbelowrespectema ? 1 : 0
+
+longOk := longOk and (not eff_respectqqe or isqqeabove)
+shortOk := shortOk and (not eff_respectqqe or isqqebelow)
+long_score += eff_respectqqe and isqqeabove ? 1 : 0
+short_score += eff_respectqqe and isqqebelow ? 1 : 0
+
+longOk := longOk and (not eff_respectsar or sarup)
+shortOk := shortOk and (not eff_respectsar or sardown)
+long_score += eff_respectsar and sarup ? 1 : 0
+short_score += eff_respectsar and sardown ? 1 : 0
+
+longOk := longOk and (not eff_respectvol or longvol)
+shortOk := shortOk and (not eff_respectvol or shortvol)
+long_score += eff_respectvol and longvol ? 1 : 0
+short_score += eff_respectvol and shortvol ? 1 : 0
+
+longOk := longOk and (not eff_respectchaikin or chaikin_long)
+shortOk := shortOk and (not eff_respectchaikin or chaikin_short)
+long_score += eff_respectchaikin and chaikin_long ? 1 : 0
+short_score += eff_respectchaikin and chaikin_short ? 1 : 0
+
+longOk := longOk and (not eff_respectvwap or long_vwap)
+shortOk := shortOk and (not eff_respectvwap or short_vwap)
+long_score += eff_respectvwap and long_vwap ? 1 : 0
+short_score += eff_respectvwap and short_vwap ? 1 : 0
+
+longOk := longOk and (not eff_respectvo or vo_long)
+shortOk := shortOk and (not eff_respectvo or vo_short)
+long_score += eff_respectvo and vo_long ? 1 : 0
+short_score += eff_respectvo and vo_short ? 1 : 0
+
+longOk := longOk and (not eff_respectao or ao_long)
+shortOk := shortOk and (not eff_respectao or ao_short)
+long_score += eff_respectao and ao_long ? 1 : 0
+short_score += eff_respectao and ao_short ? 1 : 0
+
+longOk := longOk and (not eff_respectsuperichi or superichi_long)
+shortOk := shortOk and (not eff_respectsuperichi or superichi_short)
+long_score += eff_respectsuperichi and superichi_long ? 1 : 0
+short_score += eff_respectsuperichi and superichi_short ? 1 : 0
+
+longOk := longOk and (not eff_respectwolf or wolf_long)
+shortOk := shortOk and (not eff_respectwolf or wolf_short)
+long_score += eff_respectwolf and wolf_long ? 1 : 0
+short_score += eff_respectwolf and wolf_short ? 1 : 0
+
+longOk := longOk and (not eff_respectichi or ichi_long)
+shortOk := shortOk and (not eff_respectichi or ichi_short)
+long_score += eff_respectichi and ichi_long ? 1 : 0
+short_score += eff_respectichi and ichi_short ? 1 : 0
+
+longOk := longOk and (not eff_respectmacd or ismacdup)
+shortOk := shortOk and (not eff_respectmacd or ismacddown)
+long_score += eff_respectmacd and ismacdup ? 1 : 0
+short_score += eff_respectmacd and ismacddown ? 1 : 0
+
+longOk := longOk and (not eff_respecthull or hullup)
+shortOk := shortOk and (not eff_respecthull or hulldown)
+long_score += eff_respecthull and hullup ? 1 : 0
+short_score += eff_respecthull and hulldown ? 1 : 0
+
+longOk := longOk and (not eff_respectvi or vipcondition)
+shortOk := shortOk and (not eff_respectvi or vimcondition)
+long_score += eff_respectvi and vipcondition ? 1 : 0
+short_score += eff_respectvi and vimcondition ? 1 : 0
+
+longOk := longOk and (not eff_respectstc or stcup)
+shortOk := shortOk and (not eff_respectstc or stcdown)
+long_score += eff_respectstc and stcup ? 1 : 0
+short_score += eff_respectstc and stcdown ? 1 : 0
+
+longOk := longOk and (not eff_respectdv or dvup)
+shortOk := shortOk and (not eff_respectdv or dvup)
+long_score += eff_respectdv and dvup ? 1 : 0
+short_score += eff_respectdv and dvup ? 1 : 0
+
+longOk := longOk and (not eff_respectsmc or smc_conf_long)
+shortOk := shortOk and (not eff_respectsmc or smc_conf_short)
+long_score += eff_respectsmc and smc_conf_long ? 1 : 0
+short_score += eff_respectsmc and smc_conf_short ? 1 : 0
+
+longOk := longOk and (not eff_respectsmc_htf or smc_htf_conf_long)
+shortOk := shortOk and (not eff_respectsmc_htf or smc_htf_conf_short)
+long_score += eff_respectsmc_htf and smc_htf_conf_long ? 1 : 0
+short_score += eff_respectsmc_htf and smc_htf_conf_short ? 1 : 0
+
+longOk := longOk and (not eff_respectob_mit or smc_ob_bear_mitigated)
+shortOk := shortOk and (not eff_respectob_mit or smc_ob_bull_mitigated)
+long_score += eff_respectob_mit and smc_ob_bear_mitigated ? 1 : 0
+short_score += eff_respectob_mit and smc_ob_bull_mitigated ? 1 : 0
+
+longOk := longOk and (not eff_respectbc or bc_bullishBreakout)
+shortOk := shortOk and (not eff_respectbc or bc_bearishBreakout)
+long_score += eff_respectbc and bc_bullishBreakout ? 1 : 0
+short_score += eff_respectbc and bc_bearishBreakout ? 1 : 0
+
+longOk := longOk and (not eff_respectvix or vix_conf_long)
+shortOk := shortOk and (not eff_respectvix or vix_conf_short)
+long_score += eff_respectvix and vix_conf_long ? 1 : 0
+short_score += eff_respectvix and vix_conf_short ? 1 : 0
+
+longOk := longOk and (not eff_respectsqz or sqz_conf_long)
+shortOk := shortOk and (not eff_respectsqz or sqz_conf_short)
+long_score += eff_respectsqz and sqz_conf_long ? 1 : 0
+short_score += eff_respectsqz and sqz_conf_short ? 1 : 0
+
+longOk := longOk and (not eff_respectsqz_active or sqz_active_conf_long)
+shortOk := shortOk and (not eff_respectsqz_active or sqz_active_conf_short)
+long_score += eff_respectsqz_active and sqz_active_conf_long ? 1 : 0
+short_score += eff_respectsqz_active and sqz_active_conf_short ? 1 : 0
+
+longOk := longOk and (not eff_respectsession or session_conf_long)
+shortOk := shortOk and (not eff_respectsession or session_conf_short)
+long_score += eff_respectsession and session_conf_long ? 1 : 0
+short_score += eff_respectsession and session_conf_short ? 1 : 0
+
+longOk := longOk and (not eff_respectfv_ob or fv_ob_conf_long)
+shortOk := shortOk and (not eff_respectfv_ob or fv_ob_conf_short)
+long_score += eff_respectfv_ob and fv_ob_conf_long ? 1 : 0
+short_score += eff_respectfv_ob and fv_ob_conf_short ? 1 : 0
+
+longOk := longOk and (not eff_respecttm or tm_conf_long)
+shortOk := shortOk and (not eff_respecttm or tm_conf_short)
+long_score += eff_respecttm and tm_conf_long ? 1 : 0
+short_score += eff_respecttm and tm_conf_short ? 1 : 0
+
+// Apply scoring or AND-chain mode
 if use_signal_scoring
-    long_score += (eff_respectrf and uprf) ? 1 : 0
-    long_score += (eff_respectadx and adxupcondition) ? 1 : 0
-    long_score += (eff_respecttsi and tsi_long) ? 1 : 0
-    long_score += (eff_respecthacolt and hacolt_long) ? 1 : 0
-    long_score += (eff_respectmd and md_long) ? 1 : 0
-    long_score += (eff_respecttdfi and tdfi_long) ? 1 : 0
-    long_score += (eff_respectdpo and dpo_long) ? 1 : 0
-    long_score += (eff_respectrd and rd_signal) ? 1 : 0
-    long_score += (eff_respectci and ci_filter) ? 1 : 0
-    long_score += (eff_respectroc and roc_long) ? 1 : 0
-    long_score += (eff_respectht and halftrend_long) ? 1 : 0
-    long_score += (eff_respectdonchian and donchian_long) ? 1 : 0
-    long_score += (eff_respecttrendline_breakout and tb_buysignal) ? 1 : 0
-    long_score += (eff_respectbbpt and bbpt_long) ? 1 : 0
-    long_score += (eff_respectrqk and rqkuptrend) ? 1 : 0
-    long_score += (eff_respectbx and bx_long) ? 1 : 0
-    long_score += (eff_respectbbosc and bbosc_long) ? 1 : 0
-    long_score += (eff_respectwae and wae_long) ? 1 : 0
-    long_score += (eff_respectce and ce_long) ? 1 : 0
-    long_score += (eff_respectssl and ssl_long) ? 1 : 0
-    long_score += (eff_respect2ma and ema2_long) ? 1 : 0
-    long_score += (eff_respect3ma and ema3_long) ? 1 : 0
-    long_score += (eff_respectstochastic and stoch_long) ? 1 : 0
-    long_score += (eff_respectcci and ccilong) ? 1 : 0
-    long_score += (eff_respectst and isstup) ? 1 : 0
-    long_score += (eff_respectrsi and rsiup) ? 1 : 0
-    long_score += (eff_respectrsimalimit and rsimalimitlong) ? 1 : 0
-    long_score += (eff_respectrsilimit and rsilimitlong) ? 1 : 0
-    long_score += (eff_respectrsima and rsimalong2) ? 1 : 0
-    long_score += (eff_respectema and isaboverespectema) ? 1 : 0
-    long_score += (eff_respectqqe and isqqeabove) ? 1 : 0
-    long_score += (eff_respectsar and sarup) ? 1 : 0
-    long_score += (eff_respectvol and longvol) ? 1 : 0
-    long_score += (eff_respectchaikin and chaikin_long) ? 1 : 0
-    long_score += (eff_respectvwap and long_vwap) ? 1 : 0
-    long_score += (eff_respectvo and vo_long) ? 1 : 0
-    long_score += (eff_respectao and ao_long) ? 1 : 0
-    long_score += (eff_respectsuperichi and superichi_long) ? 1 : 0
-    long_score += (eff_respectwolf and wolf_long) ? 1 : 0
-    long_score += (eff_respectichi and ichi_long) ? 1 : 0
-    long_score += (eff_respectmacd and ismacdup) ? 1 : 0
-    long_score += (eff_respecthull and hullup) ? 1 : 0
-    long_score += (eff_respectvi and vipcondition) ? 1 : 0
-    long_score += (eff_respectstc and stcup) ? 1 : 0
-    long_score += (eff_respectdv and dvup) ? 1 : 0
-    long_score += (eff_respectsmc and smc_conf_long) ? 1 : 0
-    long_score += (eff_respectsmc_htf and smc_htf_conf_long) ? 1 : 0
-    long_score += (eff_respectob_mit and smc_ob_bear_mitigated) ? 1 : 0
-    long_score += (eff_respectbc and bc_bullishBreakout) ? 1 : 0
-    long_score += (eff_respectvix and vix_conf_long) ? 1 : 0
-    long_score += (eff_respectsqz and sqz_conf_long) ? 1 : 0
-    long_score += (eff_respectsqz_active and sqz_active_conf_long) ? 1 : 0
-    long_score += (eff_respectsession and session_conf_long) ? 1 : 0
-    long_score += (eff_respectfv_ob and fv_ob_conf_long) ? 1 : 0
-    long_score += (eff_respecttm and tm_conf_long) ? 1 : 0
-
-    short_score += (eff_respectrf and downrf) ? 1 : 0
-    short_score += (eff_respectadx and adxdowncondition) ? 1 : 0
-    short_score += (eff_respecttsi and tsi_short) ? 1 : 0
-    short_score += (eff_respecthacolt and hacolt_short) ? 1 : 0
-    short_score += (eff_respectmd and md_short) ? 1 : 0
-    short_score += (eff_respecttdfi and tdfi_short) ? 1 : 0
-    short_score += (eff_respectdpo and dpo_short) ? 1 : 0
-    short_score += (eff_respectrd and rd_signal) ? 1 : 0
-    short_score += (eff_respectci and ci_filter) ? 1 : 0
-    short_score += (eff_respectroc and roc_short) ? 1 : 0
-    short_score += (eff_respectht and halftrend_short) ? 1 : 0
-    short_score += (eff_respectdonchian and donchian_short) ? 1 : 0
-    short_score += (eff_respecttrendline_breakout and tb_sellsignal) ? 1 : 0
-    short_score += (eff_respectbbpt and bbpt_short) ? 1 : 0
-    short_score += (eff_respectrqk and rqkdowntrend) ? 1 : 0
-    short_score += (eff_respectbx and bx_short) ? 1 : 0
-    short_score += (eff_respectbbosc and bbosc_short) ? 1 : 0
-    short_score += (eff_respectwae and wae_short) ? 1 : 0
-    short_score += (eff_respectce and ce_short) ? 1 : 0
-    short_score += (eff_respectssl and ssl_short) ? 1 : 0
-    short_score += (eff_respect2ma and ema2_short) ? 1 : 0
-    short_score += (eff_respect3ma and ema3_short) ? 1 : 0
-    short_score += (eff_respectstochastic and stoch_short) ? 1 : 0
-    short_score += (eff_respectcci and ccishort) ? 1 : 0
-    short_score += (eff_respectrsimalimit and rsimalimitshort) ? 1 : 0
-    short_score += (eff_respectrsilimit and rsilimitshort) ? 1 : 0
-    short_score += (eff_respectrsima and rsimashort2) ? 1 : 0
-    short_score += (eff_respectst and isstdown) ? 1 : 0
-    short_score += (eff_respectrsi and rsidown) ? 1 : 0
-    short_score += (eff_respectema and isbelowrespectema) ? 1 : 0
-    short_score += (eff_respectqqe and isqqebelow) ? 1 : 0
-    short_score += (eff_respectsar and sardown) ? 1 : 0
-    short_score += (eff_respectvol and shortvol) ? 1 : 0
-    short_score += (eff_respectchaikin and chaikin_short) ? 1 : 0
-    short_score += (eff_respectvwap and short_vwap) ? 1 : 0
-    short_score += (eff_respectvo and vo_short) ? 1 : 0
-    short_score += (eff_respectao and ao_short) ? 1 : 0
-    short_score += (eff_respectsuperichi and superichi_short) ? 1 : 0
-    short_score += (eff_respectwolf and wolf_short) ? 1 : 0
-    short_score += (eff_respectichi and ichi_short) ? 1 : 0
-    short_score += (eff_respectmacd and ismacddown) ? 1 : 0
-    short_score += (eff_respecthull and hulldown) ? 1 : 0
-    short_score += (eff_respectvi and vimcondition) ? 1 : 0
-    short_score += (eff_respectstc and stcdown) ? 1 : 0
-    short_score += (eff_respectdv and dvup) ? 1 : 0
-    short_score += (eff_respectsmc and smc_conf_short) ? 1 : 0
-    short_score += (eff_respectsmc_htf and smc_htf_conf_short) ? 1 : 0
-    short_score += (eff_respectob_mit and smc_ob_bull_mitigated) ? 1 : 0
-    short_score += (eff_respectbc and bc_bearishBreakout) ? 1 : 0
-    short_score += (eff_respectvix and vix_conf_short) ? 1 : 0
-    short_score += (eff_respectsqz and sqz_conf_short) ? 1 : 0
-    short_score += (eff_respectsqz_active and sqz_active_conf_short) ? 1 : 0
-    short_score += (eff_respectsession and session_conf_short) ? 1 : 0
-    short_score += (eff_respectfv_ob and fv_ob_conf_short) ? 1 : 0
-    short_score += eff_respecttm and tm_conf_short ? 1 : 0
-
     longCond := leadinglongcond and long_score >= signal_score_threshold
     shortCond := leadingshortcond and short_score >= signal_score_threshold
+else
+    longCond := longOk
+    shortCond := shortOk
 
  
 
@@ -5192,44 +5244,6 @@ if showdashboard and barstate.islast
             table.cell(tab1, 2, 4+j, array.get(confirmation_val_short,j), text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=color.white)
 
 
-plot(longCondition?100:na, "long Signal",display = display.data_window )
-plot(shortCondition?-100:na, "Short Signal",display = display.data_window )
-
-// Detailed indicator status dashboard
-if show_detailed_dashboard and barstate.islast
-    var table tab2 = table.new(position.bottom_right, 2, 7, color.rgb(42, 46, 57), color.rgb(204, 204, 204), 0, color.rgb(77, 71, 71), 1)
-    table.cell(tab2, 0, 0, "Indicator Status", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), bgcolor=color.rgb(68, 68, 67), text_color=color.white)
-    table.cell(tab2, 1, 0, "State", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), bgcolor=color.rgb(68, 68, 67), text_color=color.white)
-    // SMC
-    smc_status = smc_conf_long ? "Bullish" : smc_conf_short ? "Bearish" : "Neutral"
-    smc_color = smc_conf_long ? color.green : smc_conf_short ? color.red : color.gray
-    table.cell(tab2, 0, 1, "SMC Trend", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=color.white)
-    table.cell(tab2, 1, 1, smc_status, text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=smc_color)
-    // Breakout Channels
-    bc_status = bc_bullishBreakout ? "Bull Breakout" : bc_bearishBreakout ? "Bear Breakout" : bc_boxes.size() > 0 ? "In Channel" : "None"
-    bc_color = bc_bullishBreakout ? color.green : bc_bearishBreakout ? color.red : color.gray
-    table.cell(tab2, 0, 2, "Breakout Ch.", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=color.white)
-    table.cell(tab2, 1, 2, bc_status, text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=bc_color)
-    // Vix Fix
-    vix_status = vix_conf_long ? "Normal" : vix_conf_short ? "Elevated" : "N/A"
-    vix_color = vix_conf_long ? color.green : vix_conf_short ? color.red : color.gray
-    table.cell(tab2, 0, 3, "Vix Fix", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=color.white)
-    table.cell(tab2, 1, 3, vix_status, text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=vix_color)
-    // Squeeze
-    sqz_status = sqzOn ? "Squeezing" : sqz_val > 0 ? "Released Bull" : sqz_val < 0 ? "Released Bear" : "N/A"
-    sqz_color = sqzOn ? color.orange : sqz_val > 0 ? color.green : sqz_val < 0 ? color.red : color.gray
-    table.cell(tab2, 0, 4, "Squeeze", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=color.white)
-    table.cell(tab2, 1, 4, sqz_status, text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=sqz_color)
-    // EMA
-    ema_status = switch_ema and len1bool ? (close > ema1 ? "Above" : "Below") : "Off"
-    ema_color = switch_ema and len1bool ? (close > ema1 ? color.green : color.red) : color.gray
-    table.cell(tab2, 0, 5, "EMA", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=color.white)
-    table.cell(tab2, 1, 5, ema_status, text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=ema_color)
-    // STC
-    stc_status = not na(stc_val) ? (stc_val >= stc_upper_band ? "Overbought" : stc_val <= stc_lower_band ? "Oversold" : "Neutral") : "Off"
-    stc_color = not na(stc_val) ? (stc_val >= stc_upper_band ? color.green : stc_val <= stc_lower_band ? color.red : color.orange) : color.gray
-    table.cell(tab2, 0, 6, "STC", text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=color.white)
-    table.cell(tab2, 1, 6, stc_status, text_halign=text.align_left, text_size=table_size(in_dashboardtab_size), text_color=stc_color)
 
 // SMC Alerts
 alertcondition(smc_currentAlerts.swingBullishBOS, 'SMC Bullish BOS', 'Swing Bullish BOS formed')
@@ -5265,9 +5279,6 @@ plot(use_signal_scoring ? long_score : na, "Long Score", display=display.data_wi
 plot(use_signal_scoring ? short_score : na, "Short Score", display=display.data_window)
 plot(smc_conf_long ? 1 : smc_conf_short ? -1 : 0, "SMC Bias", display=display.data_window)
 plot(smc_htf_conf_long ? 1 : smc_htf_conf_short ? -1 : 0, "SMC HTF Bias", display=display.data_window)
-plot(bc_bullishBreakout ? 1 : bc_bearishBreakout ? -1 : 0, "BC Breakout", display=display.data_window)
 plot(vix_conf_long ? 1 : vix_conf_short ? -1 : 0, "Vix Fix Bias", display=display.data_window)
 plot(sqz_conf_long ? 1 : sqz_conf_short ? -1 : 0, "Squeeze Bias", display=display.data_window)
-plot(not na(stc_val) ? stc_val : na, "STC Value", display=display.data_window)
 plot(in_session ? 1 : 0, "In Session", display=display.data_window)
-plot(tm_conf_long ? 1 : tm_conf_short ? -1 : 0, "Trend Meter Bias", display=display.data_window)
