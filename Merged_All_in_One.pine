@@ -3,7 +3,7 @@
 // CM_Williams_Vix_Fix, Squeeze Momentum Indicator [LazyBear]
 //@version=6
 
-indicator(title='All-in-One Strategy Builder [Merged]', shorttitle="AIO Builder", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500, max_boxes_count=500)
+indicator(title='All-in-One Strategy Builder [Merged]', shorttitle="AIO Build", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500, max_boxes_count=500)
 
 ma(_source, _length, _type) => 
     switch _type
@@ -2633,15 +2633,15 @@ if leadingindicator == 'Trend Meter' or respecttm
     wt_bear = WTCross and WTCrossDown
 
     // Leading signals (event-based: fire on alignment change)
-    tm3_was_bear = not na(tm3_bear[1]) and tm3_bear[1]
-    tm3_was_bull = not na(tm3_bull[1]) and tm3_bull[1]
+    tm3_was_bear = tm3_bear[1] == true
+    tm3_was_bull = tm3_bull[1] == true
 
     if tm_mode == "3 TM Align"
         tm_long := tm3_bull and tm3_was_bear
         tm_short := tm3_bear and tm3_was_bull
     else if tm_mode == "3 TM + 2 TB Align"
-        tm_long := tm3_bull and tb_bull and not ((not na(tm3_bull[1]) and tm3_bull[1]) and (not na(tb_bull[1]) and tb_bull[1]))
-        tm_short := tm3_bear and tb_bear and not ((not na(tm3_bear[1]) and tm3_bear[1]) and (not na(tb_bear[1]) and tb_bear[1]))
+        tm_long := tm3_bull and tb_bull and not (tm3_bull[1] == true and tb_bull[1] == true)
+        tm_short := tm3_bear and tb_bear and not (tm3_bear[1] == true and tb_bear[1] == true)
     else if tm_mode == "3 TM + 2 TB + WT"
         tm_long := tm3_bull and tb_bull and wt_bull
         tm_short := tm3_bear and tb_bear and wt_bear
@@ -3648,20 +3648,20 @@ else // month == 11
     
 
 
-            
+
+_sess1gmt = ukDST ? 'GMT+1' : 'GMT+0'
 if ukDST
     draw_open_range(sess1Time,sess1col,show_or1,'GMT+1')
-    draw_session_hilo(sess1Time, show_rectangle1, show_label1, sess1colLabel, sess1Label, 'GMT+1')
 else
     draw_open_range(sess1Time,sess1col,show_or1,'GMT+0')
-    draw_session_hilo(sess1Time, show_rectangle1, show_label1, sess1colLabel, sess1Label, 'GMT+0')
+draw_session_hilo(sess1Time, show_rectangle1, show_label1, sess1colLabel, sess1Label, _sess1gmt)
 
+_sess2gmt = nyDST ? 'GMT+1' : 'GMT+0'
 if nyDST
     draw_open_range(sess2Time,sess2col,show_or2,'GMT+1')
-    draw_session_hilo(sess2Time, show_rectangle2, show_label2, sess2colLabel, sess2Label, 'GMT+1')
 else
     draw_open_range(sess2Time,sess2col,show_or2,'GMT+0')
-    draw_session_hilo(sess2Time, show_rectangle2, show_label2, sess2colLabel, sess2Label, 'GMT+0')
+draw_session_hilo(sess2Time, show_rectangle2, show_label2, sess2colLabel, sess2Label, _sess2gmt)
 
 // Tokyo
 draw_open_range(sess3Time,sess3col,show_or3,'GMT+0')
@@ -3671,20 +3671,20 @@ draw_session_hilo(sess3Time, show_rectangle3, show_label3, sess3colLabel, sess3L
 draw_open_range(sess4Time,sess4col,show_or4,'GMT+0')
 draw_session_hilo(sess4Time, show_rectangle4, show_label4, sess4colLabel, sess4Label, 'GMT+0')
 
+_sess5gmt = sydDST ? 'GMT+1' : 'GMT+0'
 if sydDST
     draw_open_range(sess5Time,sess5col,show_or5,'GMT+1')
-    draw_session_hilo(sess5Time, show_rectangle5, show_label5, sess5colLabel, sess5Label, 'GMT+1')
 else
     draw_open_range(sess5Time,sess5col,show_or5,'GMT+0')
-    draw_session_hilo(sess5Time, show_rectangle5, show_label5, sess5colLabel, sess5Label, 'GMT+0')
+draw_session_hilo(sess5Time, show_rectangle5, show_label5, sess5colLabel, sess5Label, _sess5gmt)
 
 
+_sess7gmt = nyDST ? 'GMT+1' : 'GMT+0'
 if nyDST
     draw_open_range(sess7Time,sess7col,show_or7,'GMT+1')
-    draw_session_hilo(sess7Time, show_rectangle7, show_label7, sess7colLabel, sess7Label, 'GMT+1')
 else
     draw_open_range(sess7Time,sess7col,show_or7,'GMT+0')
-    draw_session_hilo(sess7Time, show_rectangle7, show_label7, sess7colLabel, sess7Label, 'GMT+0')
+draw_session_hilo(sess7Time, show_rectangle7, show_label7, sess7colLabel, sess7Label, _sess7gmt)
 
 
 
@@ -4198,6 +4198,8 @@ bool smc_long = false
 bool smc_short = false
 bool smc_conf_long = false
 bool smc_conf_short = false
+bool fv_ob_conf_long = false
+bool fv_ob_conf_short = false
 
 if switch_smc or respectsmc or leadingindicator == "Smart Money Concepts"
     // Init OB boxes
@@ -4401,7 +4403,7 @@ if respectvix or leadingindicator == "Williams Vix Fix"
     vix_rangeLow = (ta.lowest(vix_wvf, vix_lb)) * vix_pl
 
     vix_elevated = vix_wvf >= vix_upperBand or vix_wvf >= vix_rangeHigh
-    vix_prev_elevated = not na(vix_elevated[1]) and vix_elevated[1]
+    vix_prev_elevated = vix_elevated[1] == true
     // Leading: event-based (trigger on transitions)
     vix_long := vix_elevated and not vix_prev_elevated
     vix_short := vix_prev_elevated and not vix_elevated
@@ -4687,8 +4689,6 @@ ema3_short = first_3ema < second_3ema and first_3ema < third_3ema and second_3em
 // Global-scope declarations for confirmation variables assigned inside if-blocks
 bool session_conf_long = false
 bool session_conf_short = false
-bool fv_ob_conf_long = false
-bool fv_ob_conf_short = false
 
 
 longCond := leadinglongcond  and   (eff_respectrf?uprf:justcontinue) and
@@ -5123,8 +5123,8 @@ alertcondition(smc_currentAlerts.swingBearishBOS, 'SMC Bearish BOS', 'Swing Bear
 alertcondition(smc_currentAlerts.swingBearishCHoCH, 'SMC Bearish CHoCH', 'Swing Bearish CHoCH formed')
 alertcondition(smc_currentAlerts.equalHighs, 'SMC Equal Highs', 'Equal highs detected')
 alertcondition(smc_currentAlerts.equalLows, 'SMC Equal Lows', 'Equal lows detected')
-alertcondition(smc_htf_conf_long and not (not na(smc_htf_conf_long[1]) and smc_htf_conf_long[1]), 'SMC HTF Trend Bullish', 'Higher-timeframe SMC trend turned bullish')
-alertcondition(smc_htf_conf_short and not (not na(smc_htf_conf_short[1]) and smc_htf_conf_short[1]), 'SMC HTF Trend Bearish', 'Higher-timeframe SMC trend turned bearish')
+alertcondition(smc_htf_conf_long and smc_htf_conf_long[1] != true, 'SMC HTF Trend Bullish', 'Higher-timeframe SMC trend turned bullish')
+alertcondition(smc_htf_conf_short and smc_htf_conf_short[1] != true, 'SMC HTF Trend Bearish', 'Higher-timeframe SMC trend turned bearish')
 alertcondition(smc_ob_bear_mitigated, 'SMC Bearish OB Mitigated', 'Bearish order block was mitigated - bullish signal')
 alertcondition(smc_ob_bull_mitigated, 'SMC Bullish OB Mitigated', 'Bullish order block was mitigated - bearish signal')
 alertcondition(fv_ob_conf_long, 'FVG-OB Bullish Confluence', 'Price in bullish FVG-OB confluence zone')
