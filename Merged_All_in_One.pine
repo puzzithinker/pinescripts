@@ -3,7 +3,7 @@
 // CM_Williams_Vix_Fix, Squeeze Momentum Indicator [LazyBear]
 //@version=6
 
-indicator(title='All-in-One Strategy Builder [Merged]', shorttitle="AIO Strategy Builder", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500, max_boxes_count=500)
+indicator(title='All-in-One Strategy Builder [Merged]', shorttitle="AIO Builder", overlay=true, max_bars_back=500, max_labels_count=500, max_lines_count=500, max_boxes_count=500)
 
 ma(_source, _length, _type) => 
     switch _type
@@ -307,8 +307,8 @@ respecthull = input.bool (false, "Hull Suite",group=confirmation_group, inline='
 
 respectvi = input.bool (false, "Vortex Indicator",group=confirmation_group, inline='vi')
 vitype = input.string(title="", defval="Simple", options=["Simple", "Advance"],group=confirmation_group, inline='vi',
- tooltip = "Simple\n Green Cross Red. \Advance\n     vipcondition := vip > vim and vip > viupper and vip > vip[1] and vim < vim[1] and vim[1] <= vilower and vip[1] >= viupper
-  vimcondition := vip < vim and vim > viupper and vim > vim[1] and vip < vip [1] and vip[1] <= vilower and vim [1] >= viupper ")
+ tooltip = "Simple\n Green Cross Red. \Advance\n     vipcondition := vip > vim and vip > viupper and vip > vip[1] and vim < vim[1] and vim[1] <= vilower and vip[1] >= viupper\n" +
+ "  vimcondition := vip < vim and vim > viupper and vim > vim[1] and vip < vip [1] and vip[1] <= vilower and vim [1] >= viupper ")
 
 respectsmc = input.bool (false, "Smart Money Concepts", group=confirmation_group, inline='smc')
 respectsmc_htf = input.bool(false, "SMC HTF Trend", group=confirmation_group, inline='smchtf', tooltip="Confirms long when higher-timeframe SMC swing trend is bullish, short when bearish")
@@ -731,8 +731,10 @@ plot(len4bool and switch_ema? ema4:na, color=ma_4_colour, linewidth=2, title='MA
 plot(len5bool and switch_ema? ema5:na, color=ma_5_colour, linewidth=2, title='MA 5')
 
 // EMA crossover signals (MA1 crosses MA2)
-ema_cross_up = len1bool and len2bool and switch_ema and show_ema_cross and ta.crossover(ema1, ema2)
-ema_cross_dn = len1bool and len2bool and switch_ema and show_ema_cross and ta.crossunder(ema1, ema2)
+_ema1_x_ema2_up = ta.crossover(ema1, ema2)
+_ema1_x_ema2_dn = ta.crossunder(ema1, ema2)
+ema_cross_up = len1bool and len2bool and switch_ema and show_ema_cross and _ema1_x_ema2_up
+ema_cross_dn = len1bool and len2bool and switch_ema and show_ema_cross and _ema1_x_ema2_dn
 plotshape(ema_cross_up, "EMA Cross Up", shape.triangleup, location.belowbar, color.new(color.lime, 0), size=size.tiny)
 plotshape(ema_cross_dn, "EMA Cross Down", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)
 
@@ -1544,10 +1546,10 @@ offset      = input(26,'Displacement',group=superichigroup)
 avg(src,length,mult)=>
     atr = ta.atr(length)*mult
     up = hl2 + atr
-    dn = hl2 - atr
+    dn_val = hl2 - atr
     upper = 0.,lower = 0.
     upper := src[1] < upper[1] ? math.min(up,upper[1]) : up
-    lower := src[1] > lower[1] ? math.max(dn,lower[1]) : dn
+    lower := src[1] > lower[1] ? math.max(dn_val,lower[1]) : dn_val
     
     os = 0,max = 0.,min = 0.
     os := src > upper ? 1 : src < lower ? 0 : os[1]
@@ -1733,8 +1735,9 @@ mg = 0.0
 
 bool md_long = false
 bool md_short = false
+_md_ema = ta.ema(md_source, md_length)
 if respectmd
-    mg := na(mg[1]) ? ta.ema(md_source, md_length) : mg[1] + (md_source - mg[1]) / (md_length * math.pow(md_source/mg[1], 4))
+    mg := na(mg[1]) ? _md_ema : mg[1] + (md_source - mg[1]) / (md_length * math.pow(md_source/mg[1], 4))
     md_long := close > mg
     md_short := close<mg
 
@@ -1862,7 +1865,8 @@ stdevMult_2 = input(2.0, title="Bands Multiplier #2", group="Standard Deviation 
 showBand_3 = input(false, title="", group="Standard Deviation Bands Settings", inline="band_3")
 stdevMult_3 = input(3.0, title="Bands Multiplier #3", group="Standard Deviation Bands Settings", inline="band_3")
 
-if barstate.islast and ta.cum(volume) == 0
+_cumVol = ta.cum(volume)
+if barstate.islast and _cumVol == 0
     runtime.error("No volume is provided by the data vendor.")
 
 float vwapValue = na
@@ -2771,7 +2775,7 @@ Mode(modeSwitch, hullsrc, len) =>
 
 //OUT
 _hull = Mode(modeSwitch, hullsrc, int(hull_length * hull_lengthMult))
-HULL = useHtf ? request.security(syminfo.ticker, htf, _hull) : _hull
+HULL = useHtf ? request.security(syminfo.tickerid, htf, _hull) : _hull
 MHULL = HULL[0]
 SHULL = HULL[2]
 
@@ -3298,19 +3302,19 @@ extendAndRemoveBx(array<box> boxArray, array<line> lineArray, array<int> countAr
     if boxArray.size() > 0
         for i = boxArray.size() -1 to 0
             line ln = lineArray.get(i)
-            box bx = boxArray.get(i)
-            bx.set_right(bar_index)
+            box bxr = boxArray.get(i)
+            bxr.set_right(bar_index)
             ln.set_x2(bar_index)
-            float price = CEcond?ln.get_price(bar_index):(isBull?bx.get_top():bx.get_bottom())    
-            float price_IOFED = isBull?bx.get_bottom():bx.get_top()          
+            float price_val = CEcond?ln.get_price(bar_index):(isBull?bxr.get_top():bxr.get_bottom())
+            float price_IOFED = isBull?bxr.get_bottom():bxr.get_top()
             int m = isBull ? 1 : -1
-            float hiLo = isBull ? high : low  
-            if hiLo * m > price * m 
+            float hiLo = isBull ? high : low
+            if hiLo * m > price_val * m
                 boxArray.remove(i)
                 lineArray.remove(i)
                 countArr1.push(isBull?1:-1) //for 'above/below threshold alerts; counter sum will decrement 1 on lower threshold hit, increment 1 on upper threshold hit
                 if deleteFilledBoxes
-                    bx.set_bgcolor(colorNone)
+                    bxr.set_bgcolor(colorNone)
                     ln.set_color(colorNone)
             if hiLo*m>price_IOFED*m
                 countArr2.push(isBull?1:-1)
@@ -4062,16 +4066,16 @@ smc_storeOB(smc_pivot p_ivot, bool internal, int bias) =>
 bool smc_ob_bull_mitigated = false
 bool smc_ob_bear_mitigated = false
 
-[bool, bool] smc_deleteOBs(bool internal = false) =>
+smc_deleteOBs(bool internal = false) =>
     array<smc_orderBlock> obs = internal ? smc_internalOBs : smc_swingOBs
     bool _bear_mit = false
     bool _bull_mit = false
     for [index, eachOB] in obs
         bool crossed = false
-        if smc_bearMitSrc > eachOB.barHigh and eachOB.bias == SMC_BEARISH
+        if (smc_bearMitSrc > eachOB.barHigh) and (eachOB.bias == SMC_BEARISH)
             crossed := true
             _bear_mit := true
-        else if smc_bullMitSrc < eachOB.barLow and eachOB.bias == SMC_BULLISH
+        else if (smc_bullMitSrc < eachOB.barLow) and (eachOB.bias == SMC_BULLISH)
             crossed := true
             _bull_mit := true
         if crossed
@@ -4243,8 +4247,8 @@ if switch_smc or respectsmc or leadingindicator == "Smart Money Concepts"
             smc_drawOBs()
 
     // FVG-OB Confluence Detection
-    bool fv_ob_conf_long = false
-    bool fv_ob_conf_short = false
+    fv_ob_conf_long := false
+    fv_ob_conf_short := false
     if smc_show_ob and smc_show_fvg
         for eachFVG in smc_fvgs
             for eachOB in smc_swingOBs
@@ -4275,7 +4279,7 @@ if switch_smc or respectsmc or leadingindicator == "Smart Money Concepts"
 
     // SMC signals
     // Leading: event-based (fire on trend change only)
-    smc_trend_changed = smc_swingTrend.bias != nz(smc_swingTrend.bias[1])
+    smc_trend_changed = smc_swingTrend.bias != nz((smc_swingTrend[1]).bias)
     smc_long := smc_swingTrend.bias == SMC_BULLISH and smc_trend_changed
     smc_short := smc_swingTrend.bias == SMC_BEARISH and smc_trend_changed
     // Confirmation: state-based (persistent bias)
@@ -4397,7 +4401,7 @@ if respectvix or leadingindicator == "Williams Vix Fix"
     vix_rangeLow = (ta.lowest(vix_wvf, vix_lb)) * vix_pl
 
     vix_elevated = vix_wvf >= vix_upperBand or vix_wvf >= vix_rangeHigh
-    vix_prev_elevated = nz(vix_elevated[1])
+    vix_prev_elevated = not na(vix_elevated[1]) and vix_elevated[1]
     // Leading: event-based (trigger on transitions)
     vix_long := vix_elevated and not vix_prev_elevated
     vix_short := vix_prev_elevated and not vix_elevated
@@ -4680,6 +4684,12 @@ if respecthull
 ema3_long = first_3ema > second_3ema and first_3ema > third_3ema and second_3ema>third_3ema
 ema3_short = first_3ema < second_3ema and first_3ema < third_3ema and second_3ema<third_3ema
 
+// Global-scope declarations for confirmation variables assigned inside if-blocks
+bool session_conf_long = false
+bool session_conf_short = false
+bool fv_ob_conf_long = false
+bool fv_ob_conf_short = false
+
 
 longCond := leadinglongcond  and   (eff_respectrf?uprf:justcontinue) and
  (eff_respectadx?adxupcondition:justcontinue)  and (eff_respecttsi?tsi_long:justcontinue) and (eff_respecthacolt?hacolt_long:justcontinue)  and (eff_respectmd?md_long:justcontinue) and (eff_respecttdfi?tdfi_long:justcontinue) and (eff_respectdpo?dpo_long:justcontinue)    and (eff_respectrd? rd_signal:justcontinue)   and (eff_respectci?ci_filter:justcontinue)  and (eff_respectroc?roc_long:justcontinue)     and (eff_respectht?halftrend_long:justcontinue)  and (eff_respectdonchian?donchian_long:justcontinue)   and (eff_respecttrendline_breakout?tb_buysignal:justcontinue) and (eff_respectbbpt?bbpt_long:justcontinue) and (eff_respectrqk?rqkuptrend:justcontinue)  and (eff_respectbx?bx_long:justcontinue)   and (eff_respectbbosc?bbosc_long:justcontinue)   and (eff_respectwae?wae_long:justcontinue)  and (eff_respectce?ce_long:justcontinue)  and (eff_respectssl?ssl_long:justcontinue) and (eff_respect2ma?ema2_long:justcontinue) and (eff_respect3ma?ema3_long:justcontinue) and (eff_respectstochastic?stoch_long:justcontinue) and (eff_respectcci?ccilong:justcontinue) and (eff_respectst?isstup:justcontinue) and (eff_respectrsi?rsiup:justcontinue) and (eff_respectrsimalimit?rsimalimitlong:justcontinue)  and (eff_respectrsilimit?rsilimitlong:justcontinue) and (eff_respectrsima?rsimalong2:justcontinue)  and (eff_respectema?isaboverespectema:justcontinue) and (eff_respectqqe?isqqeabove:justcontinue) and (eff_respectsar?sarup:justcontinue) and
@@ -4850,8 +4860,8 @@ CondIni = 0
 
 // Session filter
 in_session = na(time(timeframe.period, session_time)) == false
-session_conf_long = in_session
-session_conf_short = in_session
+session_conf_long := in_session
+session_conf_short := in_session
 
 longCondition = false
 shortCondition = false
@@ -5113,8 +5123,8 @@ alertcondition(smc_currentAlerts.swingBearishBOS, 'SMC Bearish BOS', 'Swing Bear
 alertcondition(smc_currentAlerts.swingBearishCHoCH, 'SMC Bearish CHoCH', 'Swing Bearish CHoCH formed')
 alertcondition(smc_currentAlerts.equalHighs, 'SMC Equal Highs', 'Equal highs detected')
 alertcondition(smc_currentAlerts.equalLows, 'SMC Equal Lows', 'Equal lows detected')
-alertcondition(smc_htf_conf_long and not nz(smc_htf_conf_long[1]), 'SMC HTF Trend Bullish', 'Higher-timeframe SMC trend turned bullish')
-alertcondition(smc_htf_conf_short and not nz(smc_htf_conf_short[1]), 'SMC HTF Trend Bearish', 'Higher-timeframe SMC trend turned bearish')
+alertcondition(smc_htf_conf_long and not (not na(smc_htf_conf_long[1]) and smc_htf_conf_long[1]), 'SMC HTF Trend Bullish', 'Higher-timeframe SMC trend turned bullish')
+alertcondition(smc_htf_conf_short and not (not na(smc_htf_conf_short[1]) and smc_htf_conf_short[1]), 'SMC HTF Trend Bearish', 'Higher-timeframe SMC trend turned bearish')
 alertcondition(smc_ob_bear_mitigated, 'SMC Bearish OB Mitigated', 'Bearish order block was mitigated - bullish signal')
 alertcondition(smc_ob_bull_mitigated, 'SMC Bullish OB Mitigated', 'Bullish order block was mitigated - bearish signal')
 alertcondition(fv_ob_conf_long, 'FVG-OB Bullish Confluence', 'Price in bullish FVG-OB confluence zone')
