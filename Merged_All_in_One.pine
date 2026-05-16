@@ -4042,11 +4042,11 @@ smc_drawEqualHL(smc_pivot p_ivot, float level, int size, bool equalHigh) =>
     e_Display.l_abel := label.new(chart.point.new(na, math.round(0.5 * (p_ivot.barIndex + bar_index - size)), level), tag, xloc.bar_index, color=color(na), textcolor=eqColor, style=lStyle, size=size.tiny)
 
 smc_storeOB(smc_pivot p_ivot, bool internal, int bias) =>
+    int ob_lookback = bar_index - p_ivot.barIndex
+    float ob_high = ta.highest(high, ob_lookback)
+    float ob_low = ta.lowest(low, ob_lookback)
     if (not internal and smc_show_ob) or (internal and smc_show_ob)
         float ph = bias == SMC_BEARISH ? smc_parsedHigh : smc_parsedLow
-        int ob_lookback = bar_index - p_ivot.barIndex
-        float ob_high = ta.highest(high, ob_lookback)
-        float ob_low = ta.lowest(low, ob_lookback)
         float best = bias == SMC_BEARISH ? ob_high : ob_low
         smc_orderBlock ob = smc_orderBlock.new(high, low, time, bias)
         array<smc_orderBlock> obs = internal ? smc_internalOBs : smc_swingOBs
@@ -5038,7 +5038,7 @@ getFalseShortConditionItems(arrShort) =>
 labelShortCondition = showsignal and is_expiry_count_crossed_short and not is_expiry_count_crossed_short[1] and CondIni == 1
 
 if labelShortCondition
-    falseShortConditionString = getFalseShortConditionItems(confirmation_val_short) + "\n" + "--------------------------" + "\n" + falseShortConditionString
+    falseShortConditionString = getFalseShortConditionItems(confirmation_val_short) + "\n" + "--------------------------"
     label.new(bar_index, low, "🔴", color=color.new(#dd1111, 0), textcolor=color.white, style=label.style_none, yloc=yloc.belowbar, size=size.small)
 
 
@@ -5055,7 +5055,7 @@ getFalseLongConditionItems(arr) =>
 labelCondition = showsignal and is_expiry_count_crossed_long and not is_expiry_count_crossed_long[1] and CondIni == -1
 
 if labelCondition
-    falseLongConditionString = getFalseLongConditionItems(confirmation_val) + "\n" + "--------------------------" + "\n" + falseLongConditionString
+    falseLongConditionString = getFalseLongConditionItems(confirmation_val) + "\n" + "--------------------------"
     label.new(bar_index, high, "🔴", color=color.new(color.green, 0), textcolor=color.white, style=label.style_none, yloc=yloc.abovebar, size=size.small)
 
 
