@@ -134,18 +134,15 @@ leadingindicator = input.string(title="Leading Indicator", defval="Range Filter"
 confirmation_group = "Confirmation Indicators (filter) "
 
 
-ema_
 respectema = input.bool (false, "EMA Filter", group=confirmation_group, inline='respectema')
 respectemaperiod = input.int(defval=200, minval=1, title='', group=confirmation_group, inline='respectema')
 
-ema2_
 respect2ma = input.bool (false, "2 EMA Cross : ", group=confirmation_group, inline='2ma')
 respect2maperiod_1 = input.int(defval=50,  title='',group=confirmation_group, inline='2ma')
 respect2maperiod_2 = input.int(defval=200,  title='',group=confirmation_group, inline='2ma')
 signal_type = input.string("Default", "Signal Type",group=confirmation_group, options=["Default", "Lookback"], inline='2ma')
 lookback_period = input.int(defval=3, title="Lookback Period",group=confirmation_group, minval=1,  inline='2ma')
 
-ema3_
 respect3ma = input.bool (false, "3 EMA Cross : ", group=confirmation_group, inline='3ma')
 respect3maperiod_1 = input.int(defval=9,  title='',group=confirmation_group, inline='3ma')
 respect3maperiod_2 = input.int(defval=21,  title='',group=confirmation_group, inline='3ma')
@@ -238,11 +235,9 @@ respectwae = input.bool (false, "Waddah Attar Explosion", group=confirmation_gro
 
 
 
-vo_
 respectvo = input.bool (false, "Volatility Oscillator", group=confirmation_group, inline='vo')
 
 
-ci_
 respectci = input.bool (false, "Choppiness Index  ", group=confirmation_group, inline='ci')
 ci_limit = input.float(61.8,title=" ", inline='ci',group=confirmation_group)
 
@@ -253,23 +248,19 @@ dvtype = input.string(title="", defval="Simple", options=["Simple", "Threshold",
 
 
 respectstochastic = input.bool (false, "Stochastic", group=confirmation_group, inline='stoch')
-stochtype = input.string(title="", defval="CrossOver", options=["CrossOver", "CrossOver in OB & OS levels","%K above/below %D"], group=confirmation_group, inline='stoch') 
-rsi_
+stochtype = input.string(title="", defval="CrossOver", options=["CrossOver", "CrossOver in OB & OS levels","%K above/below %D"], group=confirmation_group, inline='stoch')
 
 respectrsi = input.bool (false, "RSI", group=confirmation_group, inline='rsi')
-rsitype = input.string(title="", defval="RSI MA Cross", options=["RSI MA Cross", "RSI Exits OB/OS zones","RSI Level"], group=confirmation_group, inline='rsi') 
+rsitype = input.string(title="", defval="RSI MA Cross", options=["RSI MA Cross", "RSI Exits OB/OS zones","RSI Level"], group=confirmation_group, inline='rsi')
 
-rsima_
 respectrsima = input.bool (false, "RSI MA Direction", group=confirmation_group, inline='rsi2')
 
-rsilimit_
 respectrsilimit = input.bool (false, "RSI Limit : ", group=confirmation_group, inline='rsi3')
 
 rsilimitup = input.int(40, title="Long",inline='rsi3', group=confirmation_group)
 rsilimitdown = input.int(60, title="short",inline='rsi3', group=confirmation_group)
 
 
-rsimalimit_
 respectrsimalimit = input.bool (false, "RSI MA Limit : ", group=confirmation_group, inline='rsi4')
 
 rsimalimitup = input.int(40, title="Long",inline='rsi4', group=confirmation_group)
