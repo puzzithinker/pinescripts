@@ -134,7 +134,7 @@ leadingindicator = input.string(title="Leading Indicator", defval="Range Filter"
 confirmation_group = "Confirmation Indicators (filter) "
 
 
-respectema = input.bool (false, "EMA Filter", group=confirmation_group, inline='respectema')
+respectema = input.bool (true, "EMA Filter", group=confirmation_group, inline='respectema')
 respectemaperiod = input.int(defval=200, minval=1, title='', group=confirmation_group, inline='respectema')
 
 respect2ma = input.bool (false, "2 EMA Cross : ", group=confirmation_group, inline='2ma')
@@ -250,7 +250,7 @@ dvtype = input.string(title="", defval="Simple", options=["Simple", "Threshold",
 respectstochastic = input.bool (false, "Stochastic", group=confirmation_group, inline='stoch')
 stochtype = input.string(title="", defval="CrossOver", options=["CrossOver", "CrossOver in OB & OS levels","%K above/below %D"], group=confirmation_group, inline='stoch')
 
-respectrsi = input.bool (false, "RSI", group=confirmation_group, inline='rsi')
+respectrsi = input.bool (true, "RSI", group=confirmation_group, inline='rsi')
 rsitype = input.string(title="", defval="RSI MA Cross", options=["RSI MA Cross", "RSI Exits OB/OS zones","RSI Level"], group=confirmation_group, inline='rsi')
 
 respectrsima = input.bool (false, "RSI MA Direction", group=confirmation_group, inline='rsi2')
@@ -270,7 +270,7 @@ rsimalimitdown = input.int(60, title="short",inline='rsi4', group=confirmation_g
 
 
 
-respectmacd = input.bool (false, "MACD", group=confirmation_group, inline='macd')
+respectmacd = input.bool (true, "MACD", group=confirmation_group, inline='macd')
 macdtype = input.string(title="", defval="MACD Crossover", options=["MACD Crossover", "Zero line crossover"], group=confirmation_group, inline='macd') 
 
 respectssl = input.bool (false, "SSL Channel", group=confirmation_group, inline='ssl')
@@ -294,7 +294,7 @@ respectvi = input.bool (false, "Vortex Indicator",group=confirmation_group, inli
 vitype = input.string(title="", defval="Simple", options=["Simple", "Advance"],group=confirmation_group, inline='vi')
 
 respectsmc = input.bool (false, "Smart Money Concepts", group=confirmation_group, inline='smc')
-respectsmc_htf = input.bool(false, "SMC HTF Trend", group=confirmation_group, inline='smchtf')
+respectsmc_htf = input.bool(true, "SMC HTF Trend", group=confirmation_group, inline='smchtf')
 smc_htf_timeframe = input.timeframe("240", "", group=confirmation_group, inline='smchtf')
 respectob_mit = input.bool(false, "OB Mitigation", group=confirmation_group, inline='obmit')
 respectfv_ob = input.bool(false, "FVG-OB Confluence", group=confirmation_group, inline='fvob')
@@ -387,8 +387,8 @@ switchboard_group = "Switch Board (Turn On/Off Overlay Indicators)"
 switch_ema = input.bool (true, "EMA", group=switchboard_group, inline='Switch1')
 show_ema_cross = input.bool(true, "EMA Cross Signals", group=switchboard_group, inline='Switch1')
 switch_poi = input.bool (true, "Supply/Demand Zone", group=switchboard_group, inline='Switch1')
-switch_sar = input.bool (false, "PSAR", group=switchboard_group, inline='Switch1')
-switch_ichi = input.bool (false, "Ichimoku Cloud", group=switchboard_group, inline='Switch2')
+switch_sar = input.bool (true, "PSAR", group=switchboard_group, inline='Switch1')
+switch_ichi = input.bool (true, "Ichimoku Cloud", group=switchboard_group, inline='Switch2')
 
 switch_ha = input.bool (false, "Heiken-Ashi Candles", group=switchboard_group, inline='Switch2')
 switch_fibonacci = input.bool(false, "Fibonacci", group=switchboard_group, inline='Switch2')
@@ -397,10 +397,10 @@ switch_fibonacci = input.bool(false, "Fibonacci", group=switchboard_group, inlin
 
 switch_rd = input.bool (false, "Range Detector", group=switchboard_group, inline='Switch2')
 switch_vwap = input.bool (false, "VWAP", group=switchboard_group, inline='Switch3')
-switch_bb = input.bool (false, "Bollinger Band", group=switchboard_group, inline='Switch3')
+switch_bb = input.bool (true, "Bollinger Band", group=switchboard_group, inline='Switch3')
 
-switch_supertrend = input.bool (false, "Supertrend", group=switchboard_group, inline='Switch2')
-switch_halftrend= input.bool (false, "Half Trend", group=switchboard_group, inline='Switch2')
+switch_supertrend = input.bool (true, "Supertrend", group=switchboard_group, inline='Switch2')
+switch_halftrend= input.bool (true, "Half Trend", group=switchboard_group, inline='Switch2')
 
 switch_rangefilter = input.bool (false, "Range Filter", group=switchboard_group, inline='Switch2')
 
