@@ -4149,7 +4149,9 @@ smc_displayStructure(bool internal = false) =>
     labelSize = internal ? size.tiny : size.small
     bullColor = internal ? smc_intBullColor : smc_swingBullColor
 
-    if ta.crossover(close, p_ivot.currentLevel) and not p_ivot.crossed
+    bool bullCross = ta.crossover(close, p_ivot.currentLevel) and not p_ivot.crossed
+    smc_storeOB(p_ivot, internal, SMC_BULLISH)
+    if bullCross
         string tag = t_rend.bias == SMC_BEARISH ? "CHoCH" : "BOS"
         if internal
             smc_currentAlerts.internalBullishCHoCH := tag == "CHoCH"
@@ -4162,13 +4164,13 @@ smc_displayStructure(bool internal = false) =>
         showCond = internal ? smc_show_internals : smc_show_swing
         if showCond
             smc_drawStructure(p_ivot, tag, bullColor, lineStyle, label.style_label_down, labelSize)
-        if smc_show_ob
-            smc_storeOB(p_ivot, internal, SMC_BULLISH)
 
     p_ivot := internal ? smc_internalLow : smc_swingLow
     bearColor = internal ? smc_intBearColor : smc_swingBearColor
 
-    if ta.crossunder(close, p_ivot.currentLevel) and not p_ivot.crossed
+    bool bearCross = ta.crossunder(close, p_ivot.currentLevel) and not p_ivot.crossed
+    smc_storeOB(p_ivot, internal, SMC_BEARISH)
+    if bearCross
         string tag = t_rend.bias == SMC_BULLISH ? "CHoCH" : "BOS"
         if internal
             smc_currentAlerts.internalBearishCHoCH := tag == "CHoCH"
@@ -4181,8 +4183,6 @@ smc_displayStructure(bool internal = false) =>
         showCond = internal ? smc_show_internals : smc_show_swing
         if showCond
             smc_drawStructure(p_ivot, tag, bearColor, lineStyle, label.style_label_up, labelSize)
-        if smc_show_ob
-            smc_storeOB(p_ivot, internal, SMC_BEARISH)
 
 // SMC Execution
 bool smc_long = false
