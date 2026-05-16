@@ -110,13 +110,11 @@ table_size(s) =>
         "Small"  => size.small
         => size.tiny
 
-setup_group= "████████ Indicator Setup ████████"
-signalexpiry = input.int(defval=3,  title='Signal Expiry Candle Count',group=setup_group, inline='expiry',tooltip="Number of candles to wait for all indicators to confirm a signal. Default is 3 which means if leading indicator print the signal, it will wait for max 3 more candles for rest of the indicators to print signal, if not then this setup is invalided and will have to wait for another signal form the leading indicator.")
+setup_group= "Indicator Setup"
+signalexpiry = input.int(defval=3,  title='Signal Expiry',group=setup_group, inline='expiry',tooltip="Bars to wait for all confirmations after leading signal")
 alternatesignal = input.bool (true, "Alternate Signal", group=setup_group, inline='alternate')
-use_signal_scoring = input.bool(false, "Signal Scoring Mode", group=setup_group, inline='scoring', tooltip="Instead of requiring ALL confirmation filters to pass, signals pass when enough filters pass. More flexible than the default AND-chain.")
-signal_score_threshold = input.int(3, "Min Score", minval=1, maxval=10, group=setup_group, inline='scoring', tooltip="Minimum number of passing confirmation filters needed to confirm a signal")
 
-showsignal = input.bool (true, "Show Long/Short Signal", group=setup_group,inline='showsignal',tooltip="Option to turn on/off the Long/Short signal shown on the chart. by default it will print Long/ Short signal on the chart.")
+showsignal = input.bool (true, "Show Long/Short Signal", group=setup_group,inline='showsignal')
 
 showdashboard = input.bool (true, "Show Dashboard", group=setup_group,inline='dashboard')
 string preset = input.string("Custom", "Preset", group=setup_group, options=["Custom", "SMC Scalper", "Trend Follower", "Breakout Trader", "All Filters"], tooltip="Pre-configured setups. 'Custom' uses your individual settings. Other presets override confirmation filters and leading indicator.")
@@ -130,10 +128,10 @@ in_dashboardtab_size = input.string(title="Dashboard Size    ", defval="
 ///// Signal filters
 /////////////////////////////////////////////
 leadingindicator = input.string(title="Leading Indicator", defval="Range Filter",
- options=["Range Filter", "Rational Quadratic Kernel (RQK)","Supertrend","Half Trend","Ichimoku Cloud","SuperIchi","True Strength Indicator (TSI)","Trend Direction Force Index (TDFI)","Trendline Breakout","Range Detector","Heiken-Ashi Candlestick Oscillator","Donchian Trend Ribbon","Stochastic","RSI","Rate of Change (ROC)","VWAP","CCI","2 EMA Cross","3 EMA Cross","B-Xtrender","Bull Bear Power Trend","Detrended Price Oscillator (DPO)","BB Oscillator","Chandelier Exit","DMI (Adx)","Parabolic SAR (PSAR)","MACD","SSL Channel","Waddah Attar Explosion","Chaikin Money Flow","Vortex Index","Schaff Trend Cycle (STC)","Awesome Oscillator","Volatility Oscillator","Wolfpack Id","QQE Mod","Hull Suite","Smart Money Concepts","Breakout Channels","Williams Vix Fix","Squeeze Momentum","Trend Meter"], group='████████ Main Indicator (signal) ████████', inline='li') 
+ options=["Range Filter", "Rational Quadratic Kernel (RQK)","Supertrend","Half Trend","Ichimoku Cloud","SuperIchi","True Strength Indicator (TSI)","Trend Direction Force Index (TDFI)","Trendline Breakout","Range Detector","Heiken-Ashi Candlestick Oscillator","Donchian Trend Ribbon","Stochastic","RSI","Rate of Change (ROC)","VWAP","CCI","2 EMA Cross","3 EMA Cross","B-Xtrender","Bull Bear Power Trend","Detrended Price Oscillator (DPO)","BB Oscillator","Chandelier Exit","DMI (Adx)","Parabolic SAR (PSAR)","MACD","SSL Channel","Waddah Attar Explosion","Chaikin Money Flow","Vortex Index","Schaff Trend Cycle (STC)","Awesome Oscillator","Volatility Oscillator","Wolfpack Id","QQE Mod","Hull Suite","Smart Money Concepts","Breakout Channels","Williams Vix Fix","Squeeze Momentum","Trend Meter"], group='Main Indicator (signal)', inline='li') 
 
 
-confirmation_group = "████████ Confirmation Indicators (filter) ████████ "
+confirmation_group = "Confirmation Indicators (filter) "
 
 
 ema_tooltip = "EMA filter for confirmation.\n\n Validates Long signal if price is above the EMA FILTER level, and validates Short signal if price is below the EMA FILTER level. \n\nDefault is 200, you can change that to meet your requiremnt."
@@ -147,7 +145,7 @@ respect2maperiod_2 = input.int(defval=200,  title='',group=confirmation_group, i
 signal_type = input.string("Default", "Signal Type",group=confirmation_group, options=["Default", "Lookback"], inline='2ma')
 lookback_period = input.int(defval=3, title="Lookback Period",group=confirmation_group, minval=1, tooltip="Number of candles to look back for confirming the cross",  inline='2ma')
 
-ema3_tooltip = "Generates Long signal if first EMA (Fastest) cross above 2nd and 3rd EMA and 2nd EMA cross above 3rd EMA.\n\n Generates Short signal if first EMA (Fastest) cross below 2nd and 3rd EMA and 2nd EMA cross below 3rd EMA .\n\n Default values are 9,21 and 55. you can change that to meet your requirement."
+ema3_tooltip = "Long when fastest EMA crosses above 2nd and 3rd, and 2nd above 3rd. Short when reverse."
 respect3ma = input.bool (false, "3 EMA Cross : ", group=confirmation_group, inline='3ma',tooltip=ema3_tooltip)
 respect3maperiod_1 = input.int(defval=9,  title='',group=confirmation_group, inline='3ma',tooltip=ema3_tooltip)
 respect3maperiod_2 = input.int(defval=21,  title='',group=confirmation_group, inline='3ma',tooltip=ema3_tooltip)
@@ -175,7 +173,7 @@ respectroc = input.bool (false, "Rate of Change (ROC)", group=confirmation_group
 
 respecttsi = input.bool (false, "True Strength Indicator (TSI)", group=confirmation_group, inline='tsi')
 
-tsitooltip = "Signal Crossover:\n\n TSI crossover or greater than signal line for long, and TSI crossunder signal line for short.\n\n Zero Line Cross:\n\n TSI cross above zero line and signal line for long signal. Tsi Cross below zero and signal line for short signal."
+tsitooltip = "Signal Cross: TSI crosses signal line. Zero Cross: TSI crosses zero line."
 tsitype = input.string(title="", defval="Signal Cross", options=["Signal Cross", "Zero line cross"],tooltip=tsitooltip, group=confirmation_group, inline='tsi') 
 
 
@@ -191,22 +189,22 @@ respectdpo = input.bool (false, "Detrended Price Oscillator (DPO)", group=confir
 respectichi = input.bool (false, "Ichimoku Cloud", group=confirmation_group, inline='ichi')
 
 
-respectsuperichi = input.bool (false, "SuperIchi", group=confirmation_group, inline='ichi',tooltip="Ichimoku Cloud Conditions: \n \n 1. Candle above cloud \n \n 2. Converstion Line above base line \n \n 3. Leading 26 bar cloud is green \n \n 4. lagging span is above the cloud")
+respectsuperichi = input.bool (false, "SuperIchi", group=confirmation_group, inline='ichi',tooltip="Candle above cloud, conversion above base, green cloud, lagging span above cloud")
 
 respecttrendline_breakout = input.bool (false, "Trendline Breakout", group=confirmation_group, inline='tb')
 
-respectrd = input.bool (false, "Range Detector", group=confirmation_group, inline='rd',tooltip="Range Detector:\n\n if used as leading indicator, it will be based on range breakout. \n\n If used as confirmation indicator, it will be used to filter entries within the active range area.")
+respectrd = input.bool (false, "Range Detector", group=confirmation_group, inline='rd')
 
-respecthacolt = input.bool (false, "Heiken-Ashi Candlestick Oscillator", group=confirmation_group, inline='hacolt',tooltip="Vervoort LongTerm Heiken-Ashi Candlestick Oscillator:\n\n If oscilliation is above 0 line, then long signal is issued and if below zero line, short signal is issued.")
+respecthacolt = input.bool (false, "Heiken-Ashi Candlestick Oscillator", group=confirmation_group, inline='hacolt')
 
 
 
 respectbx = input.bool (false, "B-Xtrender", group=confirmation_group, inline='bx')
-bxtype = input.string(title="", defval="Short and Long term trend", options=["Short and Long term trend","Short Term trend"], group=confirmation_group, inline='bx', tooltip = "Short term trend:\n\n===================== \n\n For buy signal the short term trend line must turn green, and for the sell signal, the short term trend line must turn red. \n\n Short and Long term trend: \n\n===================== \n\n For buy signal, the short term trend must change from red to green and long term trend cross above zero line, for Sell signal the short term trend must turn red and long term trend line cross down the zero line..") 
+bxtype = input.string(title="", defval="Short and Long term trend", options=["Short and Long term trend","Short Term trend"], group=confirmation_group, inline='bx') 
 
 
 respectbbpt = input.bool (false, "Bull bear Power Trend", group=confirmation_group, inline='bbpt')
-bbpttype = input.string(title="", defval="Follow Trend", options=["Follow Trend","Without Trend"], group=confirmation_group, inline='bbpt', tooltip = "Follow Trend:\n\n===================== \n\n Buy signal will be validated if the BBPT trend line is above 2, and Sell signal will be validated if BBPT trend line is below -2. \n\n Without Trend: \n\n===================== \n\n Ignore the BBPT trend line.") 
+bbpttype = input.string(title="", defval="Follow Trend", options=["Follow Trend","Without Trend"], group=confirmation_group, inline='bbpt') 
 
 
 
@@ -228,11 +226,11 @@ respectcci = input.bool (false, "CCI", group=confirmation_group, inline='cci')
 
 
 respectao = input.bool (false, "Awesome Oscillator", group=confirmation_group, inline='ao')
-aotype = input.string(title="", defval="Zero Line Cross", options=["Zero Line Cross","AC Zero Line Cross","AC Momentum Bar"], group=confirmation_group, inline='ao', tooltip = "Zero Line Cross:\n\n If AO value cross the zero line up, Buy signal will be generated, and if AO value cross down the zero line, sell signal will be generated.") 
+aotype = input.string(title="", defval="Zero Line Cross", options=["Zero Line Cross","AC Zero Line Cross","AC Momentum Bar"], group=confirmation_group, inline='ao') 
 
 
 respectadx = input.bool (false, "DMI (ADx)", group=confirmation_group, inline='adx')
-adxtype = input.string(title="", defval="Adx & +Di -Di", options=["Adx Only","Adx & +Di -Di", "Advance"], group=confirmation_group, inline='adx', tooltip = "Adx Only:\n\n If Adx value is above the defined level. \n\n Adx & +Di -DI :\n\n When Adx value is above the defined level and croseeover between +di and -di. Di will determine the direction of the movement. \n\n Advance: ") 
+adxtype = input.string(title="", defval="Adx & +Di -Di", options=["Adx Only","Adx & +Di -Di", "Advance"], group=confirmation_group, inline='adx') 
 
 respectsar = input.bool (false, "Parabolic SAR (PSAR)", group=confirmation_group, inline='sar')
 
@@ -241,11 +239,11 @@ respectwae = input.bool (false, "Waddah Attar Explosion", group=confirmation_gro
 
 
 
-vo_tooltip = "Volatility Oscillator: \n\n ======================= \n\n If the spike line is above the upper line, buy signal is generated (or validated). \n\n If the spike line is below the lower line, sell signal is generated (or validated)."
+vo_tooltip = "Buy when spike above upper line, Sell when spike below lower line."
 respectvo = input.bool (false, "Volatility Oscillator", group=confirmation_group, inline='vo', tooltip = vo_tooltip)
 
 
-ci_tooltip = "Choppiness index: \n\n ======================= \n\n If the index is below the defined threshold (default 61.8) then asset is considered trending and signal will be validated, if index is above 61.8 then asset is considered having sideway movement."
+ci_tooltip = "Below threshold = trending (validates signals). Above = sideways."
 respectci = input.bool (false, "Choppiness Index  ", group=confirmation_group, inline='ci')
 ci_limit = input.float(61.8,title=" ", inline='ci',group=confirmation_group, tooltip = ci_tooltip)
 
@@ -254,26 +252,26 @@ respectdv = input.bool (false, "Damiani Volatility (DV)", group=confirmation_gro
 dvtype = input.string(title="", defval="Simple", options=["Simple", "Threshold","10p Difference"], group=confirmation_group, inline='dv', tooltip = "Simple\n Volatility is green. \nThreshold\n Volatility green and >1.1") 
 
 
-stochtooltip="CrossOver:\n------------------\n\n CrossOver of K and D line at any level. \n\n CrossOver in OB & OS levels:\n\n Generate buy signal if crossover happens in oversold area and crossing up oversold level.\n\n Generate sell signal on crossover in overbought area and cross down upper level. \n------------------\n\n %K above/below %D\n------------------\n: Generate Buy signal or validate other signal if %K is above %D and opposite for Sell Signal."
+stochtooltip="Crossover: K/D cross at any level. OB/OS: Buy on K crossing up from oversold, Sell on K crossing down from overbought. K above/below D: Buy if K>D, Sell if K<D."
 
 respectstochastic = input.bool (false, "Stochastic", group=confirmation_group, inline='stoch')
 stochtype = input.string(title="", defval="CrossOver", options=["CrossOver", "CrossOver in OB & OS levels","%K above/below %D"],tooltip=stochtooltip, group=confirmation_group, inline='stoch') 
-rsi_tooltip = "RSI MA Cross:\n=============\n Generate buy signal when RSI cross up RSI MA line and sell signal when RSI cross down RSI MA line.\n\nRSI Exits OB/OS zones:\n==================\n Generate Buy signal when RSI crosses down the overbough zone and sell signal when RSI crosses up the oversold zone.\n\nRSI Level:\n==========\nGenerate buy signal if RSI cross above the specific level and sell signal when RSI crossdown the level.\n\n\n +++++\nYou can change the setting to define the OB/OS and MidLine Levels"
+rsi_tooltip = "MA Cross: Buy/Sell on RSI crossing MA. OB/OS: Buy exiting OB, Sell exiting OS. Level: Buy/Sell on RSI crossing level."
 
 respectrsi = input.bool (false, "RSI", group=confirmation_group, inline='rsi')
 rsitype = input.string(title="", defval="RSI MA Cross", options=["RSI MA Cross", "RSI Exits OB/OS zones","RSI Level"], tooltip=rsi_tooltip, group=confirmation_group, inline='rsi') 
 
-rsima_tooltip = "RSI MA Direction:\n=============\n The buy and sell signal will respect the RSI MA direction. For buy signal, the RSI MA should be increasing or same compared to previous RSI MA. \n\n for SHORT, the RSI MA should be same or decreasing compared to last RSI MA"
+rsima_tooltip = "RSI MA Direction: Buy when RSI MA rising, Short when RSI MA falling."
 respectrsima = input.bool (false, "RSI MA Direction", group=confirmation_group, inline='rsi2',tooltip=rsima_tooltip)
 
-rsilimit_tooltip = "RSI Limit:\n=============\n This is to allow you to set limit for the RSI value for long and short. default value for long is 40, which means if the RSI is 40 or above, only then BUY signal will be validated. \n\nfor short if RSI is 60 or less, only then sell signal willbe validated."
+rsilimit_tooltip = "RSI Limit: Long when RSI >= level (default 40), Short when RSI <= level (default 60)."
 respectrsilimit = input.bool (false, "RSI Limit : ", group=confirmation_group, inline='rsi3',tooltip=rsilimit_tooltip)
 
 rsilimitup = input.int(40, title="Long",inline='rsi3', group=confirmation_group)
 rsilimitdown = input.int(60, title="short",inline='rsi3', group=confirmation_group)
 
 
-rsimalimit_tooltip = "RSI MA Limit:\n=============\n This is to allow you to set limit for the RSI MA value for long and short. default value for long is 40, which means if the RSI MA is 40 or above, only then BUY signal will be validated. \n\nfor short if RSI MA is 60 or less, only then sell signal willbe validated."
+rsimalimit_tooltip = "RSI MA Limit: Long when RSI MA >= level (default 40), Short when RSI MA <= level (default 60)."
 respectrsimalimit = input.bool (false, "RSI MA Limit : ", group=confirmation_group, inline='rsi4',tooltip=rsimalimit_tooltip)
 
 rsimalimitup = input.int(40, title="Long",inline='rsi4', group=confirmation_group)
@@ -283,7 +281,7 @@ rsimalimitdown = input.int(60, title="short",inline='rsi4', group=confirmation_g
 
 
 
-macdtooltip="MACD Crossover:\n------------------\n\n CrossOver of MACD and the Signal line. Generates Long signal when MACD cross up Signal line and Short signal when MACD cross down Signal Line. . \n\n Zero line crossover:\n------------------\n\n Generate buy signal when MACD cross up the zero line and Sell signal when MACD cross down the zero line."
+macdtooltip="MACD cross: Long on MACD crossing above Signal, Short on crossing below. Zero cross: Long/Short on MACD crossing zero line."
 respectmacd = input.bool (false, "MACD", group=confirmation_group, inline='macd')
 macdtype = input.string(title="", defval="MACD Crossover", options=["MACD Crossover", "Zero line crossover"],tooltip=macdtooltip, group=confirmation_group, inline='macd') 
 
@@ -293,21 +291,19 @@ respectstc = input.bool (false, "Schaff Trend Cycle (STC)", group=confirmation_g
 respectchaikin = input.bool (false, "Chaikin Money Flow", group=confirmation_group, inline='chaikin')
 
 respectvol = input.bool (false, "Volume", group=confirmation_group, inline='volume')
-volumetype = input.string(title="", defval="volume above MA", options=["volume above MA","Simple", "Delta"], group=confirmation_group, inline='volume', tooltip = "Simple volume is comparing the up/down volme with previous candle. \nVolume delta will compare the delta or difference between up and down volume with previous candle.\nExample:\n up volume = 100 \n Down volume=-1100\n Delta = -1000\n Satisfy the bear flag condition if previous -ve delta is lower")
+volumetype = input.string(title="", defval="volume above MA", options=["volume above MA","Simple", "Delta"], group=confirmation_group, inline='volume')
 
 respectwolf = input.bool (false, "Wolfpack Id", group=confirmation_group, inline='wolf')
 
 
 respectqqe = input.bool (false, "QQE Mod", group=confirmation_group, inline='qqe')
-qqetype = input.string(title="", defval="Line", options=["Line", "Bar","Line & Bar"], group=confirmation_group, inline='qqe', tooltip = "Line: signal generated when QQE line is above or below 0. \nBar: when Blue bar is above 0 or Red bar below 0 \nLine & Bar: Both Bar and Line to be above(bullist) or below (bearish) 0" )
+qqetype = input.string(title="", defval="Line", options=["Line", "Bar","Line & Bar"], group=confirmation_group, inline='qqe')
 
 respecthull = input.bool (false, "Hull Suite",group=confirmation_group, inline='hull')
 
 
 respectvi = input.bool (false, "Vortex Indicator",group=confirmation_group, inline='vi')
-vitype = input.string(title="", defval="Simple", options=["Simple", "Advance"],group=confirmation_group, inline='vi',
- tooltip = "Simple\n Green Cross Red. \Advance\n     vipcondition := vip > vim and vip > viupper and vip > vip[1] and vim < vim[1] and vim[1] <= vilower and vip[1] >= viupper\n" +
- "  vimcondition := vip < vim and vim > viupper and vim > vim[1] and vip < vip [1] and vip[1] <= vilower and vim [1] >= viupper ")
+vitype = input.string(title="", defval="Simple", options=["Simple", "Advance"],group=confirmation_group, inline='vi')
 
 respectsmc = input.bool (false, "Smart Money Concepts", group=confirmation_group, inline='smc')
 respectsmc_htf = input.bool(false, "SMC HTF Trend", group=confirmation_group, inline='smchtf', tooltip="Confirms long when higher-timeframe SMC swing trend is bullish, short when bearish")
@@ -399,7 +395,7 @@ bool eff_respecttm         = is_all_filters or respecttm
 // Switch Board
 ////////////////////////////////////////////////////////////////////////
 
-switchboard_group = "████ Switch Board (Turn On/Off Overlay Indicators) ████"
+switchboard_group = "Switch Board (Turn On/Off Overlay Indicators)"
 switch_ema = input.bool (false, "EMA", group=switchboard_group, inline='Switch1')
 show_ema_cross = input.bool(true, "EMA Cross Signals", group=switchboard_group, inline='Switch1', tooltip="Show crossover markers when fast MA crosses above/below slow MA")
 switch_poi = input.bool (true, "Supply/Demand Zone", group=switchboard_group, inline='Switch1')
@@ -444,7 +440,7 @@ eff_switch_squeeze = switch_squeeze or leadingindicator == 'Squeeze Momentum'
 
 
 // Fibonacci settings
-fibgroup = "█████████ Fibonacci Display Settting █████████"
+fibgroup = "Fibonacci Display Settting"
 devTooltip = "Deviation is a multiplier that affects how much the price should deviate from the previous pivot in order for the bar to become a new pivot."
 depthTooltip = "The minimum number of bars that will be taken into account when calculating the indicator."
 threshold_multiplier2 = input.float(title="Deviation", defval=3, minval=0, tooltip=devTooltip,group=fibgroup)
@@ -683,7 +679,7 @@ if (switch_fibonacci)  // Check the boolean here
 // EMA Selection
 ////////////////////////////////////////////////////////////////////////
 
-ma_group= "██████████ MAs Line ██████████"
+ma_group= "MAs Line"
 len1bool = input.bool(true,'',group=ma_group,inline='len1')
 len1 = input.int(5,  title='MA 1',group=ma_group,inline='len1')
 string ma_1_type = input.string(defval='EMA', title='Type', options=['RMA', 'SMA', 'EMA', 'WMA','HMA','VWMA'], inline='len1',group=ma_group)
@@ -818,11 +814,11 @@ if respect3ma  or leadingindicator=='3 EMA Cross'
 // Pivots
 //////////////////////////////////////////////////////////////////////////
 
-pivot_group = '██████████ Pivot Levels ██████████'
+pivot_group = 'Pivot Levels'
 pivotTypeInput = input.string(title="Type", defval="Traditional", options=["Traditional", "Fibonacci", "Woodie", "Classic", "DM", "Camarilla"],group=pivot_group)
 pivotAnchorInput = input.string(title="Pivots Timeframe", defval="Auto", options=["Auto", "Daily", "Weekly", "Monthly", "Quarterly", "Yearly", "Biyearly", "Triyearly", "Quinquennially", "Decennially"],group=pivot_group)
 maxHistoricalPivotsInput = input.int(title="Number of Pivots Back", defval=1, minval=1, maxval=200, display = display.data_window,group=pivot_group)
-isDailyBasedInput = input.bool(title="Use Daily-based Values", defval=true,group=pivot_group, display = display.data_window, tooltip="When this option is unchecked, Pivot Points will use intraday data while calculating on intraday charts. If Extended Hours are displayed on the chart, they will be taken into account during the pivot level calculation. If intraday OHLC values are different from daily-based values (normal for stocks), the pivot levels will also differ.")
+isDailyBasedInput = input.bool(title="Use Daily-based Values", defval=true,group=pivot_group, display = display.data_window)
 showLabelsInput = input.bool(title="Show Labels", defval=true,group=pivot_group, display = display.data_window)
 showPricesInput = input.bool(title="Show Prices", defval=true,group=pivot_group, display = display.data_window)
 positionLabelsInput = input.string("Left", "Labels Position", options=["Left", "Right"],group=pivot_group, display = display.data_window)
@@ -1005,7 +1001,7 @@ if (barstate.islastconfirmedhistory and drawnGraphics.columns() == 0 and switch_
 
 
 // Define "n" as the number of periods and keep a minimum value of 2 for error handling.
-n = input.int(title="Periods", defval=2, minval=2,group="██████████ Fractal ██████████")
+n = input.int(title="Periods", defval=2, minval=2,group="Fractal")
 
 
 // UpFractal
@@ -1060,7 +1056,7 @@ plotshape(upFractal and switch_fractal ? true : false, style=shape.triangleup,  
 // Range Filter
 //////////////////////////////////////////////////////////////////////////
 
-rf_group= "██████████ Range Filter ██████████"
+rf_group= "Range Filter"
 
 //switch_rangefilter  = input.bool (true, "Show Range Filter Signals", group='=============== Range Filter ================')
 showrfline = input.bool (true, "Show RF line", group=rf_group)
@@ -1126,7 +1122,7 @@ rng_qty = input.float(defval=2.618, minval=0.0000001, title='Range Size')
 rng_scale = input.string(defval='Average Change', options=['Points', 'Pips', 'Ticks', '% of Price', 'ATR', 'Average Change', 'Standard Deviation', 'Absolute'], title='Range Scale')
 
 //Range Period
-rng_per = input.int(defval=14, minval=1, title='Range Period (for ATR, Average Change, and Standard Deviation)')
+rng_per = input.int(defval=14, minval=1, title='Range Period')
 
 //Range Smoothing Inputs
 smooth_range = input(defval=true, title='Smooth Range')
@@ -1194,11 +1190,11 @@ else if rftype == 'DW'
 /// RQK
 ////////////////////////////////
 
-rqkgroupname = '████████ Rational Quadratic Kernel (RQK) ████████'
+rqkgroupname = 'Rational Quadratic Kernel (RQK)'
 rqksrc = input.source(close, 'Source', group=rqkgroupname)
 h2 = input.float(8., 'Lookback Window', minval=3., tooltip='The number of bars used for the estimation. This is a sliding value that represents the most recent historical bars. Recommended range: 3-50', group=rqkgroupname)
-r = input.float(8., 'Relative Weighting', step=0.25, group=rqkgroupname, tooltip='Relative weighting of time frames. As this value approaches zero, the longer time frames will exert more influence on the estimation. As this value approaches infinity, the behavior of the Rational Quadratic Kernel will become identical to the Gaussian kernel. Recommended range: 0.25-25')
-x_0 = input.int(25, "Start Regression at Bar", group=rqkgroupname, tooltip='Bar index on which to start regression. The first bars of a chart are often highly volatile, and omission of these initial bars often leads to a better overall fit. Recommended range: 5-25')
+r = input.float(8., 'Relative Weighting', step=0.25, group=rqkgroupname)
+x_0 = input.int(25, "Start Regression at Bar", group=rqkgroupname)
 smoothColors = input.bool(false, "Smooth Colors", group=rqkgroupname, tooltip="Uses a crossover based mechanism to determine colors. This often results in less color transitions overall.", inline='1')
 lag = input.int(2, "Lag", group=rqkgroupname, tooltip="Lag for crossover detection. Lower values result in earlier crossovers. Recommended range: 1-2", inline='1')
 size = array.size(array.from(rqksrc)) // size of the data series
@@ -1250,7 +1246,7 @@ if respectrqk or leadingindicator=="Rational Quadratic Kernel (RQK)"
 /////////////////////////////
 ////////// TSI
 /////////////////////////////
-tsi_group = "██████████ True Strength Indicator (TSI) ██████████"
+tsi_group = "True Strength Indicator (TSI)"
 
 tsi_long_length = input(title="Long Length", defval=25,group=tsi_group)
 tsi_short_length = input(title="Short Length", defval=13,group=tsi_group)
@@ -1284,7 +1280,7 @@ if respecttsi or leadingindicator == 'True Strength Indicator (TSI)'
 ///// Super Trend
 //////////////////////////////
 
-sp_group = "██████████ SuperTrend ██████████"
+sp_group = "SuperTrend"
 
 Periods = input(title='ATR Period', defval=10, group=sp_group)
 stsrc = input(hl2, title='Source', group=sp_group)
@@ -1332,7 +1328,7 @@ plotshape(stsellSignal  and switch_supertrend  ? dn : na, title='DownTrend Begin
 /////////// Half Trend
 ////////////////////////////////////////////
 
-ht_group = "██████████ HalfTrend ██████████"
+ht_group = "HalfTrend"
 amplitude = input(title='Amplitude', defval=2,group=ht_group)
 channelDeviation = input(title='Channel Deviation', defval=2,group=ht_group)
 showArrows = input(title='Show Arrows', defval=true,group=ht_group)
@@ -1432,7 +1428,7 @@ htPlot = plot(switch_halftrend ? ht:na, title='HalfTrend', linewidth=2, color=ht
 //Settings
 //-----------------------------------------------------------------------------{
 
-tbgroup= "██████████ Trendline Breakout ██████████"
+tbgroup= "Trendline Breakout"
 length_tb = input.int(14, 'Swing Detection Lookback',group=tbgroup)
 mult_tb = input.float(1., 'Slope', minval = 0, step = .1,group=tbgroup)
 calcMethod = input.string('Atr', 'Slope Calculation Method', options = ['Atr','Stdev','Linreg'],group=tbgroup)
@@ -1496,7 +1492,7 @@ if respecttrendline_breakout or leadingindicator=="Trendline Breakout"
 ////// Ichimoku
 /////////////////////////////////////////////
 
-ichigroup = "██████████ Ichimoku  ██████████"
+ichigroup = "Ichimoku"
 conversionPeriods = input.int(9, minval=1, title="Conversion Line Length",group=ichigroup)
 basePeriods = input.int(26, minval=1, title="Base Line Length",group=ichigroup)
 laggingSpan2Periods = input.int(52, minval=1, title="Leading Span B Length",group=ichigroup)
@@ -1535,7 +1531,7 @@ fill(p1, p2, color = leadLine1 > leadLine2 and switch_ichi ? color.rgb(67, 160, 
 //////////////////////////////
 ///////// SuperIchi
 /////////////////////////////
-superichigroup = "██████████ SuperIchi  ██████████"
+superichigroup = "SuperIchi"
 
 tenkan_len  = input(9,'Tenkan          ',inline='tenkan',group=superichigroup)
 tenkan_mult = input(2.,'',inline='tenkan',group=superichigroup)
@@ -1580,7 +1576,7 @@ if respectsuperichi or leadingindicator == 'SuperIchi'
 //////////////////////////////////
 ///////////Donchian Channel Ribbon
 ///////////////////////////////////
-donchiangroup = "██████████ Donchian Channel Ribbon ██████████"
+donchiangroup = "Donchian Channel Ribbon"
 dlen = input.int(defval=15, title='Donchian Channel Period', group=donchiangroup)
 
 dchannel(len) =>
@@ -1611,7 +1607,7 @@ if respectdonchian or leadingindicator == 'Donchian Trend Ribbon'
 // DMI code
 ////////////////////////////////
 
-dmi_group = "████████ Directional Movement Index (DMI) ████████"
+dmi_group = "Directional Movement Index (DMI)"
 adxlen = input(5, title="ADX", group=dmi_group, inline='dmi')
 keyLevel = input(20, title='ADX limit',group=dmi_group, inline='dmi')
 dilen = input.int(10, title="DI Length",group=dmi_group, inline='dmi')
@@ -1660,7 +1656,7 @@ if respectadx or leadingindicator == 'DMI (Adx)'
 //Parabolic SAR
 ///////////////////////////////////////////////
 //showsar = input.bool (false, "Show SAR", group='-------------------------Parabolic SAR-------------------------')
-psar_group = "██████████ Parabolic SAR (PSAR) ██████████"
+psar_group = "Parabolic SAR (PSAR)"
 start = input.float(0.02, group=psar_group, inline ='sar')
 increment = input.float(0.02, group=psar_group, inline ='sar')
 maximum = input.float(0.2, 'Max Value', group=psar_group, inline ='sar')
@@ -1684,7 +1680,7 @@ plot(switch_sar  ? out : na, 'ParabolicSAR', style=plot.style_cross, color=sarco
 //////////////////////////////////////////////////
 ///////// TDFI
 /////////////////////////////////////////////////
-rdfi_group = "█████ Trend Direction Force Index (TDFI) █████ "
+rdfi_group = "Trend Direction Force Index (TDFI) "
 
 lookback = input(13, title='Lookback',group=rdfi_group)
 mmaLength = input(13, title='MMA Length',group=rdfi_group)
@@ -1731,7 +1727,7 @@ if respecttdfi or leadingindicator == 'Trend Direction Force Index (TDFI)'
 //////////////////////////////////////////////////
 ///////// McGinley Dynamic
 /////////////////////////////////////////////////
-md_group = "████████████████████ McGinley Dynamic ████████████████████"
+md_group = "McGinley Dynamic"
 
 
 md_length = input.int(14, minval=1,group=md_group)
@@ -1750,7 +1746,7 @@ if respectmd
 //////////////////////////////////////////////////
 ///////// CCI
 /////////////////////////////////////////////////
-cci_group = "████████████████████ CCI ████████████████████"
+cci_group = "CCI"
 ccilength = input.int(20,title="CCI Length", minval=1,inline="cci", group=cci_group)
 ccisrc = input(hlc3, title="Source",inline="cci", group=cci_group)
 cciupperband = input.int(100,title="Upper Band",inline="cci2", group=cci_group)
@@ -1779,7 +1775,7 @@ ccishort = cci < ccilowerband
 /////// B-Xtrender
 /////////////////////////////////////////////
 
-bxgroup= "██████████ B-Xtrender ██████████"
+bxgroup= "B-Xtrender"
 short_l1 = input(5, title='Short - L1',group=bxgroup)
 short_l2 = input(20, title='Short - L2',group=bxgroup)
 short_l3 = input(15, title='Short - L3',group=bxgroup)
@@ -1856,7 +1852,7 @@ if respectbbpt or leadingindicator == 'Bull Bear Power Trend'
 //////////// VWAP
 /////////////////////////////////////////////
 
-vwap_group = "██████████ VWAP Settings ██████████"
+vwap_group = "VWAP Settings"
 hideonDWM = input(false, title="Hide VWAP on 1D or Above", group=vwap_group)
 var anchor = input.string(defval = "Session", title="Anchor Period",
  options=["Session", "Week", "Month", "Quarter", "Year", "Decade", "Century", "Earnings", "Dividends", "Splits"], group=vwap_group)
@@ -1925,7 +1921,7 @@ short_vwap = close < vwapValue
 ///////////////////////////////////////////////
 
 
-ChandelierE = "██████████ Chandelier Exit ██████████"
+ChandelierE = "Chandelier Exit"
 
 ce_length = input(title='ATR Period', defval=22,group=ChandelierE)
 ce_mult = input.float(title='ATR Multiplier', step=0.1, defval=3.0,group=ChandelierE)
@@ -1963,7 +1959,7 @@ if respectce or leadingindicator == 'Chandelier Exit'
 ////// ROC
 ///////////////////////////////////////////////
 
-roc_group = "██████████ Rate of Change (ROC) ██████████"
+roc_group = "Rate of Change (ROC)"
 
 
 roc_length = input.int(9, minval=1,group=roc_group)
@@ -1979,7 +1975,7 @@ roc_short = roc<0
 ///////////////////////////////////////////////
 
 
-group_ssl = "██████████ SSL Channel ██████████"
+group_ssl = "SSL Channel"
 SSLperiod = input(title='Period', defval=10, group=group_ssl)
 SSLlen = input(title='Period', defval=10, group=group_ssl)
 smaHigh = ta.sma(high, SSLlen)
@@ -1995,7 +1991,7 @@ ssl_short = sslUp<sslDown
 ////// Chaikin Money Flow
 ///////////////////////////////////////////////
 
-group_chaikin = "██████████ Chaiken Money Flow ██████████"
+group_chaikin = "Chaiken Money Flow"
 chaiking_length = input.int(20, minval=1, group = group_chaikin )
 bool chaikin_long = false
 bool chaikin_short = false
@@ -2009,7 +2005,7 @@ if respectchaikin or leadingindicator == 'Chaikin Money Flow'
 ////////////////////////////////////////////////
 ////// Vortex INdex
 ///////////////////////////////////////////////
-vortex_group = "██████████ Vortex Index ██████████"
+vortex_group = "Vortex Index"
 
 period_ = input.int(14, title="Length", minval=2, group=vortex_group, inline = 'vi')
 viupper = input.float(1.1, title="Upper band",group=vortex_group, inline = 'vi')
@@ -2038,7 +2034,7 @@ if respectvi or leadingindicator == 'Vortex Index'
 /////////////////////////////////////////////////
 ////////Waddar Atar explosion (WAR)
 //////////////////////////////////////////////////
-group_wae = "██████████ Waddah Attar Explosion ██████████"
+group_wae = "Waddah Attar Explosion"
 
 
 wae_sensitivity = input(150, title="Sensitivity",group=group_wae)
@@ -2085,7 +2081,7 @@ if respectwae or leadingindicator == 'Waddah Attar Explosion'
 ////////// Range Detector
 //////////////////////////////////////////////
 
-rdgroup= "██████████ Range Detector ██████████"
+rdgroup= "Range Detector"
 
 
 //------------------------------------------------------------------------------
@@ -2194,7 +2190,7 @@ plot(switch_rd ? rd_min:na, 'Range Bottom'
 /////////////////////////////////////////////////
 ////////Volatility Oscillator
 //////////////////////////////////////////////////
-group_vo = "██████████ Volatility Oscillator ██████████"
+group_vo = "Volatility Oscillator"
 volength = input(100, group = group_vo)
 
 bool vo_long = false
@@ -2211,7 +2207,7 @@ if respectvo or leadingindicator == 'Volatility Oscillator'
 /////////////////////////////////////////////////
 ////////Detrended Price Oscillator (DPO)
 //////////////////////////////////////////////////
-group_dpo = "██████████ Detrended Price Oscillator (DPO) ██████████"
+group_dpo = "Detrended Price Oscillator (DPO)"
 
 dpo_period_ = input.int(10, title="Length", minval=1,group=group_dpo)
 isCentered = input(false, title="Centered",group=group_dpo)
@@ -2229,7 +2225,7 @@ if respectdpo or leadingindicator == 'Detrended Price Oscillator (DPO)'
 /////////////////////////////////////////////////
 ////////HACOLT
 //////////////////////////////////////////////////
-hacolt_group = "███████ Heiken-Ashi Candlestick Oscillator ███████"
+hacolt_group = "Heiken-Ashi Candlestick Oscillator"
 
 hacolt_length = input(defval=55, title="TEMA Period",group=hacolt_group)
 hacolt_emaLength = input(defval=60, title="EMA Period",group=hacolt_group)
@@ -2297,7 +2293,7 @@ if respecthacolt or leadingindicator == "Heiken-Ashi Candlestick Oscillator"
 /////////////////////////////////////////////////
 ////////Choppiness Index
 //////////////////////////////////////////////////
-group_ci = "██████████ Choppiness Index ██████████"
+group_ci = "Choppiness Index"
 
 
 
@@ -2313,7 +2309,7 @@ bool ci_filter = if respectci
 ////////Damiani Volatmeter
 //////////////////////////////////////////////////
 
-dv_group = "██████████ Damiani Volatmeter ██████████"
+dv_group = "Damiani Volatmeter"
 int vis_atr = input.int(13,title="Vis ATR", group=dv_group, inline = '1')
 int vis_std = input.int(20,title="Vis STD", group=dv_group, inline = '1')
 int sed_atr = input.int(40,title="Sed ATR", group=dv_group, inline = '1')
@@ -2345,7 +2341,7 @@ if respectdv
 //////////////////////////////////////////////
 /////// MACD
 /////////////////////////////////////////////
-macd_group = "██████████ MACD ██████████"
+macd_group = "MACD"
 fast_length = input(title="Fast Length", defval=12,group=macd_group)
 slow_length = input(title="Slow Length", defval=26,group=macd_group)
 macdsrc = input(title="Source", defval=close,group=macd_group)
@@ -2375,7 +2371,7 @@ if respectmacd or leadingindicator == 'MACD'
 ///// Awesome Oscillator
 ////////////////////////////////////////////
 
-ao_group = "██████████ Awesome Oscillator ██████████"
+ao_group = "Awesome Oscillator"
 nLengthSlow = input(34, title="Length Slow",group=ao_group)
 nLengthFast = input(5,  title="Length Fast",group=ao_group)
 reverse = input(false, title="Trade reverse",group=ao_group)
@@ -2411,7 +2407,7 @@ if respectao or leadingindicator == 'Awesome Oscillator'
 ///// WolfPack ID
 ////////////////////////////////////////////
 
-wolfgroup = "██████████ Wolf Pack ID ██████████"
+wolfgroup = "Wolf Pack ID"
 input1 = input(title='Fast Length', group=wolfgroup,defval=3)
 input2 = input(title='Slow Length',group=wolfgroup, defval=8)
 pivR = input(title='Wolfpack Wave Pivot Lookback Right', group=wolfgroup,defval=1)
@@ -2451,7 +2447,7 @@ if respectwolf or leadingindicator == 'Wolfpack Id'
 ///// Bollinger Band (BB)
 ////////////////////////////////////////////
 
-bb_group= "██████████ Bollinger Band ██████████"
+bb_group= "Bollinger Band"
 bb_length = input.int(20, minval=1)
 bb_maType = input.string("SMA", "Basis MA Type", options = ["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
 bbsrc = input(close, title="Source")
@@ -2481,7 +2477,7 @@ fill(bbp1, bbp2, title = "Background", color=fillColor)
 /////////////////////////////////////////////
 ///// BB Oscillator
 ////////////////////////////////////////////
-bbgroup = "██████████ Bollinger Band (BB) Oscillator ██████████"
+bbgroup = "Bollinger Band (BB) Oscillator"
 
 bbosc_length = input.int(20, minval=1,group=bbgroup)
 bbosc_src = input(close, title='Source',group=bbgroup)
@@ -2525,7 +2521,7 @@ if respectbbosc or leadingindicator == 'BB Oscillator'
 /////////////////////////////////
 /////// Trend Meter
 /////////////////////////////////
-tm_group = "██████████ Trend Meter ██████████"
+tm_group = "Trend Meter"
 
 tm_mode = input.string("3 TM Align", "Alignment Mode", options=["3 TM Align", "3 TM + 2 TB Align", "3 TM + 2 TB + WT"], group=tm_group, tooltip="3 TM Align: all 3 trend meters same direction. 3 TM + 2 TB: trend meters and trend bars aligned. 3 TM + 2 TB + WT: includes wavetrend filter.")
 
@@ -2666,7 +2662,7 @@ if leadingindicator == 'Trend Meter' or respecttm
 /////////////////////////////////
 /////// Stochastic
 /////////////////////////////////
-groupname = "██████████ Stochastic ██████████"
+groupname = "Stochastic"
 len = input.int(14, minval=1, title="Length",group=groupname)
 smoothK = input.int(3, minval=1, title="K Smoothing",group=groupname)
 smoothD = input.int(3, minval=1, title="D Smoothing",group=groupname)
@@ -2702,7 +2698,7 @@ if respectstochastic or leadingindicator == 'Stochastic'
 ///////RSI
 ///////////////////////////////////////////////
 
-rsi_group = "█████████████████ RSI  █████████████████"
+rsi_group = "RSI"
 
 rsiLengthInput = input.int(14, minval=1, title="RSI Length", group=rsi_group)
 rsiSourceInput = input.source(close, "Source", group=rsi_group)
@@ -2751,7 +2747,7 @@ if respectrsi or respectrsima or respectrsimalimit or respectrsilimit or leading
 ///////////////////////////////////////////////
 /// HULL SUITE
 //////////////////////////////////////////////
-hull_group = "██████████ HullSuite ██████████"
+hull_group = "HullSuite"
 //INPUT
 hullsrc = input(close, title='Source',group=hull_group)
 modeSwitch = input.string('Hma', title='Hull Variation', options=['Hma', 'Thma', 'Ehma'],group=hull_group)
@@ -2792,7 +2788,7 @@ SHULL = HULL[2]
 /////////////////////////
 /// STC overlay signal
 /////////////////////////
-stc_group = "██████████ Schaff Trend Cycle (STC) ██████████"
+stc_group = "Schaff Trend Cycle (STC)"
 fastLength = input(title='MACD Fast Length', defval=23, group=stc_group)
 slowLength = input(title='MACD Slow Length', defval=50, group=stc_group)
 cycleLength = input(title='Cycle Length', defval=10, group=stc_group)
@@ -2844,7 +2840,7 @@ bgcolor(eff_switch_stc and stc_val >= stc_upper_band ? color.new(color.green, st
 
 // Indicator Settings 
 
-pvsra_group="██████████ PVSRA ██████████"
+pvsra_group="PVSRA"
 
 var overideCandleColours = input.bool(title='Override Candles with PVSRA Colour', defval=true, tooltip="Indicator must be dragged to the top of the Object Tree to display correctly", group=pvsra_group)
 
@@ -2941,7 +2937,7 @@ plotcandle(open, high, low, close, color=(overideCandleColours and switch_pvsra 
 //////// SUpply/Demand POI
 //////////////////////////////////////////////////
 //      INDICATOR SETTINGS
-poi_group = '██████████ Supply/Demand Zone ██████████'
+poi_group = 'Supply/Demand Zone'
 swing_length = input.int(10, title = 'Swing High/Low Length', group = poi_group, minval = 1, maxval = 50)
 history_of_demand_to_keep = input.int(20, title = 'History To Keep', minval = 5, maxval = 50, group = poi_group)
 box_width = input.float(2.5, title = 'Supply/Demand Box Width', group = poi_group, minval = 1, maxval = 10, step = 0.5)
@@ -3231,7 +3227,7 @@ if not dirUp
 ////////////////////////////////////////////////////
 
 
-hagroup = "███████ Heiken-ashi candles ███████"
+hagroup = "Heiken-ashi candles"
 
 
 hkClose         = ohlc4
@@ -3273,7 +3269,7 @@ plotcandle(
 ////////////////////////////////////////////////////
 
 
-fvggroup = "██████████ Fair Value Gap (FVG) ██████████"
+fvggroup = "Fair Value Gap (FVG)"
 numDays = input.int(7, "number of days lookback",group=fvggroup)
 showUP = input.bool(true, "'UP' FVGs:", inline ='1',group=fvggroup)
 colUp = input.color(color.new(color.blue, 86), "", inline ='1',group=fvggroup)
@@ -3283,7 +3279,7 @@ showCE = input.bool(true, "show CE", inline ='3',group=fvggroup)
 ceCol = input.color(color.new(color.black, 1), "| color:", inline ='3',group=fvggroup)
 ceStyle = input.string(line.style_dotted, "| style:", options=[line.style_dotted,line.style_solid,  line.style_dashed], inline ='3',group=fvggroup)
 deleteFilledBoxes = input.bool(true, "delete filled boxes & lines",group=fvggroup)
-CEcond = input.bool (false, "Use CE (as opposed to Full Fill)",group=fvggroup, tooltip = "If toggled OFF, FVGs and CEs will paint until FVG has been completely filled.\n\nThis threshold is used for Above/Below threshold Alert conditions too (but does not effect the IOFED alerts):\ni.e. this will determine if your 'ABOVE threshold' alert fires when price hits most recent FVG CE ABOVE or most recent FVG Full Fill ABOVE\n\nAlerts are set by clicking the three dots on the indicator display line.")
+CEcond = input.bool (false, "Use CE (as opposed to Full Fill)",group=fvggroup)
 colorNone = color.new(color.white, 100)
 _day = 24*3600*1000
 var box bxUp = na, var box bxDn = na, var line lnUp = na, var line lnDn = na
@@ -3344,11 +3340,11 @@ dnIOFEDlast= array.sum(_countArrIOFED)<array.sum(_countArrIOFED)[1]
 
 import TradersReality/Traders_Reality_Lib/1 as trLib
 
-vz_group = "██████████ Liquidity Zone ██████████"
+vz_group = "Liquidity Zone"
 color redVectorColor = input.color(title='Vector: Red', group=vz_group, defval=color.red, inline='vectors')
 color greenVectorColor = input.color(title='Green', group=vz_group, defval=color.lime, inline='vectors')
 color violetVectorColor = input.color(title='Violet', group=vz_group, defval=color.fuchsia, inline='vectors')
-color blueVectorColor = input.color(title='Blue', group=vz_group, defval=color.blue, inline='vectors', tooltip='Bull bars are green and bear bars are red when the bar is with volume >= 200% of the average volume of the 10 previous bars, or bars where the product of candle spread x candle volume is >= the highest for the 10 previous bars.\n Bull bars are blue and bear are violet when the bar is with with volume >= 150% of the average volume of the 10 previous bars.')
+color blueVectorColor = input.color(title='Blue', group=vz_group, defval=color.blue, inline='vectors')
 color regularCandleUpColor = input.color(title='Regular: Up Candle', group=vz_group, defval=#999999, inline='nonVectors')
 color regularCandleDownColor = input.color(title='Down Candle', group=vz_group, defval=#4d4d4d, inline='nonVectors', tooltip='Bull bars are light gray and bear are dark gray when none of the red/green/blue/violet vector conditions are met.')
 bool setcandlecolors = input.bool(false, title='Set PVSRA candle colors?', group=vz_group, inline='setCandle')
@@ -3413,75 +3409,75 @@ trLib.cleanarr(zoneBoxesBelow)
 string weekend_sessions = ':1234567'
 string no_weekend_sessions = ':23456'
 
-bool show_rectangle1 = input.bool(group='Market session: London (0800-1630 UTC+0) - DST Aware', defval=true, title='Show: session?', inline='session1conf', tooltip='If this checkbox is off, Label and Open Range have no effect') and show_markets
-bool show_label1 = input.bool(group='Market session: London (0800-1630 UTC+0) - DST Aware', defval=true, title='Label?', inline='session1conf') and show_rectangle1 and show_markets
-bool show_or1 = input.bool(group='Market session: London (0800-1630 UTC+0) - DST Aware', defval=true, title='Opening Range?', inline='session1conf', tooltip='This controls the shaded area for the session') and show_rectangle1 and show_markets
-string sess1Label = input.string(group='Market session: London (0800-1630 UTC+0) - DST Aware', defval='London', title='Name:', inline='session1style')
-color sess1col = input.color(group='Market session: London (0800-1630 UTC+0) - DST Aware', title='Color: Box', defval=color.rgb(120, 123, 134, 75), inline='session1style')
-color sess1colLabel = input.color(group='Market session: London (0800-1630 UTC+0) - DST Aware', title='Label', defval=color.rgb(120, 123, 134, 0), inline='session1style')
-string sess1TimeX = '0800-1630'//input.session(group='Market session: London (0800-1630 UTC+0)', defval='0800-1630', title='Time (UTC+0):', inline='session1style', tooltip='Normally you will not want to adjust these times. Defaults are taken as if the session is NOT in DST and times must be in UTC+0. Note due to limitations of pinescript some values sellected here other than the default might not work correctly on all exchanges.')
-string rectStyle = input.string(group='Market session: London (0800-1630 UTC+0) - DST Aware', defval='Dashed', title='Line style of Market Session hi/lo line', options=['Dashed', 'Solid'])
+bool show_rectangle1 = input.bool(group='Session: London', defval=true, title='Show: session?', inline='session1conf' ) and show_markets
+bool show_label1 = input.bool(group='Session: London', defval=true, title='Label?', inline='session1conf') and show_rectangle1 and show_markets
+bool show_or1 = input.bool(group='Session: London', defval=true, title='Opening Range?', inline='session1conf') and show_rectangle1 and show_markets
+string sess1Label = input.string(group='Session: London', defval='London', title='Name:', inline='session1style')
+color sess1col = input.color(group='Session: London', title='Color: Box', defval=color.rgb(120, 123, 134, 75), inline='session1style')
+color sess1colLabel = input.color(group='Session: London', title='Label', defval=color.rgb(120, 123, 134, 0), inline='session1style')
+string sess1TimeX = '0800-1630'
+string rectStyle = input.string(group='Session: London', defval='Dashed', title='Line style of Market Session hi/lo line', options=['Dashed', 'Solid'])
 sessLineStyle = line.style_dashed
-bool show_markets_weekends = input.bool(false, group='Market session: London (0800-1630 UTC+0) - DST Aware', title='Show Market Session on Weekends?', tooltip='Turn on or off market sessions in the weekends. Note do not turn this on for exchanges that dont have weekend data like OANDA') 
+bool show_markets_weekends = input.bool(false, group='Session: London', title='Show on Weekends?') 
 
 
 sess1Time = show_markets_weekends ? sess1TimeX + weekend_sessions : sess1TimeX + no_weekend_sessions
 
 
-bool show_rectangle2 = input.bool(group='Market session: New York (1430-2100 UTC+0) - DST Aware', defval=true, title='Show: session?', inline='session2conf', tooltip='If this checkbox is off, Label and Open Range have no effect') and show_markets
-bool show_label2 = input.bool(group='Market session: New York (1430-2100 UTC+0) - DST Aware', defval=true, title='Label?', inline='session2conf') and show_rectangle2 and show_markets
-bool show_or2 = input.bool(group='Market session: New York (1430-2100 UTC+0) - DST Aware', defval=true, title='Opening Range?', inline='session2conf', tooltip='This controls the shaded area for the session') and show_rectangle2 and show_markets
-string sess2Label = input.string(group='Market session: New York (1430-2100 UTC+0) - DST Aware', defval='NewYork', title='Name:', inline='session2style')
-color sess2col = input.color(group='Market session: New York (1430-2100 UTC+0) - DST Aware', title='Color: Box', defval=color.rgb(251, 86, 91, 75), inline='session2style')
-color sess2colLabel = input.color(group='Market session: New York (1430-2100 UTC+0) - DST Aware', title='Label', defval=color.rgb(253, 84, 87, 25), inline='session2style')
-string sess2TimeX = '1430-2100'//input.session(group='Market session: New York (1430-2100 UTC+0)', defval='1430-2100', title='Time (UTC+0):', inline='session2style', tooltip='Normally you will not want to adjust these times. Defaults are taken as if the session is NOT in DST times must be in UTC+0. Note due to limitations of pinescript some values sellected here other than the default might not work correctly on all exchanges.')
+bool show_rectangle2 = input.bool(group='Session: New York', defval=true, title='Show: session?', inline='session2conf' ) and show_markets
+bool show_label2 = input.bool(group='Session: New York', defval=true, title='Label?', inline='session2conf') and show_rectangle2 and show_markets
+bool show_or2 = input.bool(group='Session: New York', defval=true, title='Opening Range?', inline='session2conf') and show_rectangle2 and show_markets
+string sess2Label = input.string(group='Session: New York', defval='NewYork', title='Name:', inline='session2style')
+color sess2col = input.color(group='Session: New York', title='Color: Box', defval=color.rgb(251, 86, 91, 75), inline='session2style')
+color sess2colLabel = input.color(group='Session: New York', title='Label', defval=color.rgb(253, 84, 87, 25), inline='session2style')
+string sess2TimeX = '1430-2100'
 sess2Time = show_markets_weekends ? sess2TimeX + weekend_sessions : sess2TimeX  + no_weekend_sessions
 
 
-bool show_rectangle3 = input.bool(group='Market session: Tokyo (0000-0600 UTC+0) - DST Aware', defval=true, title='Show: session?', inline='session3conf', tooltip='If this checkbox is off, Label and Open Range have no effect') and show_markets
-bool show_label3 = input.bool(group='Market session: Tokyo (0000-0600 UTC+0) - DST Aware', defval=true, title='Label?', inline='session3conf') and show_rectangle3 and show_markets
-bool show_or3 = input.bool(group='Market session: Tokyo (0000-0600 UTC+0) - DST Aware', defval=true, title='Opening Range?', inline='session3conf', tooltip='This controls the shaded area for the session') and show_rectangle3 and show_markets
-string sess3Label = input.string(group='Market session: Tokyo (0000-0600 UTC+0) - DST Aware', defval='Tokyo', title='Name:', inline='session3style')
-color sess3col = input.color(group='Market session: Tokyo (0000-0600 UTC+0) - DST Aware', title='Color: Box', defval=color.rgb(80, 174, 85, 75), inline='session3style')
-color sess3colLabel = input.color(group='Market session: Tokyo (0000-0600 UTC+0) - DST Aware', title='Label', defval=color.rgb(80, 174, 85, 25), inline='session3style')
-string sess3TimeX = '0000-0600'//input.session(group='Market session: Tokyo (0000-0600 UTC+0)', defval='0000-0600', title='Time (UTC+0):', inline='session3style', tooltip='Normally you will not want to adjust these times. Defaults are taken as if the session is NOT in DST times must be in UTC+0. Note due to limitations of pinescript some values sellected here other than the default might not work correctly on all exchanges.')
+bool show_rectangle3 = input.bool(group='Session: Tokyo', defval=true, title='Show: session?', inline='session3conf' ) and show_markets
+bool show_label3 = input.bool(group='Session: Tokyo', defval=true, title='Label?', inline='session3conf') and show_rectangle3 and show_markets
+bool show_or3 = input.bool(group='Session: Tokyo', defval=true, title='Opening Range?', inline='session3conf') and show_rectangle3 and show_markets
+string sess3Label = input.string(group='Session: Tokyo', defval='Tokyo', title='Name:', inline='session3style')
+color sess3col = input.color(group='Session: Tokyo', title='Color: Box', defval=color.rgb(80, 174, 85, 75), inline='session3style')
+color sess3colLabel = input.color(group='Session: Tokyo', title='Label', defval=color.rgb(80, 174, 85, 25), inline='session3style')
+string sess3TimeX = '0000-0600'
 sess3Time = show_markets_weekends ? sess3TimeX + weekend_sessions : sess3TimeX + no_weekend_sessions
 
 
-bool show_rectangle4 = input.bool(group='Market session: Hong Kong (0130-0800 UTC+0) - DST Aware', defval=true, title='Show: session?', inline='session4conf', tooltip='If this checkbox is off, Label and Open Range have no effect') and show_markets
-bool show_label4 = input.bool(group='Market session: Hong Kong (0130-0800 UTC+0) - DST Aware', defval=true, title='Label?', inline='session4conf') and show_rectangle4 and show_markets
-bool show_or4 = input.bool(group='Market session: Hong Kong (0130-0800 UTC+0) - DST Aware', defval=true, title='Opening Range?', inline='session4conf', tooltip='This controls the shaded area for the session') and show_rectangle4 and show_markets
-string sess4Label = input.string(group='Market session: Hong Kong (0130-0800 UTC+0) - DST Aware', defval='HongKong', title='Name:', inline='session4style')
-color sess4col = input.color(group='Market session: Hong Kong (0130-0800 UTC+0) - DST Aware', title='Color: Box', defval=color.rgb(128, 127, 23, 75), inline='session4style')
-color sess4colLabel = input.color(group='Market session: Hong Kong (0130-0800 UTC+0) - DST Aware', title='Label', defval=color.rgb(128, 127, 23, 25), inline='session4style')
-string sess4TimeX = '0130-0800'//input.session(group='Market session: Hong Kong (0130-0800 UTC+0)', defval='0130-0800', title='Time (UTC+0):', inline='session4style', tooltip='Normally you will not want to adjust these times. Defaults are taken as if the session is NOT in DST times must be in UTC+0. Note due to limitations of pinescript some values sellected here other than the default might not work correctly on all exchanges.')
+bool show_rectangle4 = input.bool(group='Session: Hong Kong', defval=true, title='Show: session?', inline='session4conf' ) and show_markets
+bool show_label4 = input.bool(group='Session: Hong Kong', defval=true, title='Label?', inline='session4conf') and show_rectangle4 and show_markets
+bool show_or4 = input.bool(group='Session: Hong Kong', defval=true, title='Opening Range?', inline='session4conf') and show_rectangle4 and show_markets
+string sess4Label = input.string(group='Session: Hong Kong', defval='HongKong', title='Name:', inline='session4style')
+color sess4col = input.color(group='Session: Hong Kong', title='Color: Box', defval=color.rgb(128, 127, 23, 75), inline='session4style')
+color sess4colLabel = input.color(group='Session: Hong Kong', title='Label', defval=color.rgb(128, 127, 23, 25), inline='session4style')
+string sess4TimeX = '0130-0800'
 sess4Time = show_markets_weekends ? sess4TimeX + weekend_sessions : sess4TimeX + no_weekend_sessions
 
-bool show_rectangle5 = input.bool(group='Market session: Sydney (NZX+ASX 2200-0600 UTC+0) - DST Aware', defval=true, title='Show: session?', inline='session5conf', tooltip='If this checkbox is off, Label and Open Range have no effect') and show_markets
-bool show_label5 = input.bool(group='Market session: Sydney (NZX+ASX 2200-0600 UTC+0) - DST Aware', defval=true, title='Label?', inline='session5conf') and show_rectangle5 and show_markets
-bool show_or5 = input.bool(group='Market session: Sydney (NZX+ASX 2200-0600 UTC+0) - DST Aware', defval=true, title='Opening Range?', inline='session5conf', tooltip='This controls the shaded area for the session') and show_rectangle5 and show_markets
-string sess5Label = input.string(group='Market session: Sydney (NZX+ASX 2200-0600 UTC+0) - DST Aware', defval='Sydney', title='Name:', inline='session5style')
-color sess5col = input.color(group='Market session: Sydney (NZX+ASX 2200-0600 UTC+0) - DST Aware', title='Color: Box', defval=color.rgb(37, 228, 123, 75), inline='session5style')
-color sess5colLabel = input.color(group='Market session: Sydney (NZX+ASX 2200-0600 UTC+0) - DST Aware', title='Label', defval=color.rgb(37, 228, 123, 25), inline='session5style')
-string sess5TimeX = '2200-0600'//input.session(group='Market session: Sydney (NZX+ASX 2200-0600 UTC+0)', defval='2200-0600', title='Time (UTC+0):', inline='session5style', tooltip='Normally you will not want to adjust these times. Defaults are taken as if the session is NOT in DST times must be in UTC+0. Note due to limitations of pinescript some values sellected here other than the default might not work correctly on all exchanges.')
+bool show_rectangle5 = input.bool(group='Session: Sydney', defval=true, title='Show: session?', inline='session5conf' ) and show_markets
+bool show_label5 = input.bool(group='Session: Sydney', defval=true, title='Label?', inline='session5conf') and show_rectangle5 and show_markets
+bool show_or5 = input.bool(group='Session: Sydney', defval=true, title='Opening Range?', inline='session5conf') and show_rectangle5 and show_markets
+string sess5Label = input.string(group='Session: Sydney', defval='Sydney', title='Name:', inline='session5style')
+color sess5col = input.color(group='Session: Sydney', title='Color: Box', defval=color.rgb(37, 228, 123, 75), inline='session5style')
+color sess5colLabel = input.color(group='Session: Sydney', title='Label', defval=color.rgb(37, 228, 123, 25), inline='session5style')
+string sess5TimeX = '2200-0600'
 sess5Time = show_markets_weekends ? sess5TimeX + weekend_sessions : sess5TimeX + no_weekend_sessions
 
-bool show_rectangle6 = input.bool(group='Market session: EU Brinks (0800-0900 UTC+0) - DST Aware', defval=true, title='Show: session?', inline='session6conf', tooltip='If this checkbox is off, Label and Open Range have no effect') and show_markets
-bool show_label6 = input.bool(group='Market session: EU Brinks (0800-0900 UTC+0) - DST Aware', defval=true, title='Label?', inline='session6conf') and show_rectangle6 and show_markets
-bool show_or6 = input.bool(group='Market session: EU Brinks (0800-0900 UTC+0) - DST Aware', defval=true, title='Opening Range?', inline='session6conf', tooltip='This controls the shaded area for the session') and show_rectangle6 and show_markets
-string sess6Label = input.string(group='Market session: EU Brinks (0800-0900 UTC+0) - DST Aware', defval='EU Brinks', title='Name:', inline='session6style')
-color sess6col = input.color(group='Market session: EU Brinks (0800-0900 UTC+0) - DST Aware', title='Color: Box', defval=color.rgb(255, 255, 255, 65), inline='session6style')
-color sess6colLabel = input.color(group='Market session: EU Brinks (0800-0900 UTC+0) - DST Aware', title='Label', defval=color.rgb(255, 255, 255, 25), inline='session6style')
-string sess6TimeX = '0800-0900'//input.session(group='Market session: EU Brinks (0800-0900 UTC+0)', defval='0800-0900', title='Time (UTC+0):', inline='session6style', tooltip='Normally you will not want to adjust these times. Defaults are taken as if the session is NOT in DST times must be in UTC+0. Note due to limitations of pinescript some values sellected here other than the default might not work correctly on all exchanges.')
+bool show_rectangle6 = input.bool(group='Session: EU Brinks', defval=true, title='Show: session?', inline='session6conf' ) and show_markets
+bool show_label6 = input.bool(group='Session: EU Brinks', defval=true, title='Label?', inline='session6conf') and show_rectangle6 and show_markets
+bool show_or6 = input.bool(group='Session: EU Brinks', defval=true, title='Opening Range?', inline='session6conf') and show_rectangle6 and show_markets
+string sess6Label = input.string(group='Session: EU Brinks', defval='EU Brinks', title='Name:', inline='session6style')
+color sess6col = input.color(group='Session: EU Brinks', title='Color: Box', defval=color.rgb(255, 255, 255, 65), inline='session6style')
+color sess6colLabel = input.color(group='Session: EU Brinks', title='Label', defval=color.rgb(255, 255, 255, 25), inline='session6style')
+string sess6TimeX = '0800-0900'
 sess6Time = show_markets_weekends ? sess6TimeX + weekend_sessions : sess6TimeX + no_weekend_sessions
 
-bool show_rectangle7 = input.bool(group='Market session: US Brinks (1400-1500 UTC+0) - DST Aware', defval=true, title='Show: session?', inline='session7conf', tooltip='If this checkbox is off, Label and Open Range have no effect') and show_markets
-bool show_label7 = input.bool(group='Market session: US Brinks (1400-1500 UTC+0) - DST Aware', defval=true, title='Label?', inline='session7conf') and show_rectangle7 and show_markets
-bool show_or7 = input.bool(group='Market session: US Brinks (1400-1500 UTC+0) - DST Aware', defval=true, title='Opening Range?', inline='session7conf', tooltip='This controls the shaded area for the session') and show_rectangle7 and show_markets
-string sess7Label = input.string(group='Market session: US Brinks (1400-1500 UTC+0) - DST Aware', defval='US Brinks', title='Name:', inline='session7style')
-color sess7col = input.color(group='Market session: US Brinks (1400-1500 UTC+0) - DST Aware', title='Color: Box', defval=color.rgb(255, 255, 255, 65), inline='session7style')
-color sess7colLabel = input.color(group='Market session: US Brinks (1400-1500 UTC+0) - DST Aware', title='Label', defval=color.rgb(255, 255, 255, 25), inline='session7style')
-string sess7TimeX = '1400-1500'//input.session(group='Market session: US Brinks (1400-1500 UTC+0)', defval='1400-1500', title='Time (UTC+0):', inline='session7style', tooltip='Normally you will not want to adjust these times. Defaults are taken as if the session is NOT in DST times must be in UTC+0. Note due to limitations of pinescript some values sellected here other than the default might not work correctly on all exchanges.')
+bool show_rectangle7 = input.bool(group='Session: US Brinks', defval=true, title='Show: session?', inline='session7conf' ) and show_markets
+bool show_label7 = input.bool(group='Session: US Brinks', defval=true, title='Label?', inline='session7conf') and show_rectangle7 and show_markets
+bool show_or7 = input.bool(group='Session: US Brinks', defval=true, title='Opening Range?', inline='session7conf') and show_rectangle7 and show_markets
+string sess7Label = input.string(group='Session: US Brinks', defval='US Brinks', title='Name:', inline='session7style')
+color sess7col = input.color(group='Session: US Brinks', title='Color: Box', defval=color.rgb(255, 255, 255, 65), inline='session7style')
+color sess7colLabel = input.color(group='Session: US Brinks', title='Label', defval=color.rgb(255, 255, 255, 25), inline='session7style')
+string sess7TimeX = '1400-1500'
 sess7Time = show_markets_weekends ? sess7TimeX + weekend_sessions : sess7TimeX + no_weekend_sessions
 
 
@@ -3699,7 +3695,7 @@ draw_session_hilo(sess7Time, show_rectangle7, show_label7, sess7colLabel, sess7L
 ////QQE MOD
 /////////////////////////////////////////////////
 
-qqe_gorup = "██████████ QQE ██████████"
+qqe_gorup = "QQE"
 RSI_Period = input(6, title='RSI Length', group=qqe_gorup)
 SF = input(5, title='RSI Smoothing', group=qqe_gorup)
 QQE = input(3, title='Fast QQE Factor', group=qqe_gorup)
@@ -3828,7 +3824,7 @@ if respectqqe or leadingindicator == 'QQE Mod'
 /////////////////////////////////////////////////
 /////////////// Volume Up/Down
 ////////////////////////////////////////////////
-vgroup = "██████████ Up/Down Volume ██████████"
+vgroup = "Up/Down Volume"
 lowerTimeframeTooltip = "The indicator scans lower timeframe data to approximate Up/Down volume. By default, the timeframe is chosen automatically. These inputs override this with a custom timeframe.\n\nHigher timeframes provide more historical data, but the data will be less precise."
 useCustomTimeframeInput = input.bool(false, "Use custom timeframe", tooltip = lowerTimeframeTooltip,group=vgroup)
 lowerTimeframeInput = input.timeframe("1", "Timeframe",group=vgroup)
@@ -3903,8 +3899,8 @@ sardown = out > close
 // SMART MONEY CONCEPTS [LuxAlgo] - Integrated
 //==============================================================================
 
-smc_group = "██████████ Smart Money Concepts ██████████"
-smc_mode = input.string("Present", "Mode", group=smc_group, options=["Historical", "Present"], tooltip="Historical shows all structure labels. Present shows only the latest — uses fewer labels.")
+smc_group = "Smart Money Concepts"
+smc_mode = input.string("Present", "Mode", group=smc_group, options=["Historical", "Present"], tooltip=\"Historical: all labels. Present: latest only — fewer labels.\")
 smc_style = input.string("Colored", "Style", group=smc_group, options=["Colored", "Monochrome"], tooltip="Colored uses distinct colors for bullish/bearish. Monochrome uses neutral tones.")
 smc_show_internals = input.bool(true, "Show Internal Structure", group=smc_group, tooltip="Show internal BOS/CHoCH structure (shorter swing)")
 smc_show_swing = input.bool(true, "Show Swing Structure", group=smc_group, tooltip="Show swing BOS/CHoCH structure (larger swings)")
@@ -4299,9 +4295,9 @@ if switch_smc or respectsmc or leadingindicator == "Smart Money Concepts"
 // SMART MONEY BREAKOUT CHANNELS [AlgoAlpha] - Integrated
 //==============================================================================
 
-bc_group = "██████████ Breakout Channels ██████████"
+bc_group = "Breakout Channels"
 bc_overlap = input.bool(false, "Nested Channels", group=bc_group, tooltip="Allow multiple channels to overlap. When disabled, only one channel at a time.")
-bc_strong = input.bool(true, "Strong Closes Only", group=bc_group, tooltip="Breakouts only trigger when >50% of candle body is outside the channel. Reduces false signals from wicks.")
+bc_strong = input.bool(true, "Strong Closes Only", group=bc_group, tooltip="Breakouts need >50% body outside channel")
 bc_norm_length = input.int(100, "Normalization Length", minval=1, group=bc_group, tooltip="Bars used for price normalization. Higher = more stable but less responsive.")
 bc_box_length = input.int(14, "Box Detection Length", minval=1, group=bc_group, tooltip="Bars used to detect channel patterns. Lower = more channels but noisier.")
 bc_show_vol = input.bool(true, "Show Volume Analysis", group=bc_group, tooltip="Display volume bars within channels")
@@ -4388,7 +4384,7 @@ plotshape(bc_downbreak != 0 ? bc_downbreak : na, "BC Bearish Breakout", shape.la
 // WILLIAMS VIX FIX - Integrated
 //==============================================================================
 
-vix_group = "██████████ Williams Vix Fix ██████████"
+vix_group = "Williams Vix Fix"
 vix_pd = input.int(22, "Lookback Period", group=vix_group, tooltip="Period for highest close lookup. Standard is 22 (1 month of daily bars).")
 vix_bbl = input.int(20, "Bollinger Band Length", group=vix_group, tooltip="Length for Bollinger Band calculation on Vix Fix values")
 vix_mult = input.float(2.0, "BB StdDev Up", minval=1.0, maxval=5.0, group=vix_group, tooltip="Standard deviation multiplier for upper Bollinger Band")
@@ -4422,7 +4418,7 @@ if respectvix or leadingindicator == "Williams Vix Fix"
 // SQUEEZE MOMENTUM [LazyBear] - Integrated
 //==============================================================================
 
-sqz_group = "██████████ Squeeze Momentum ██████████"
+sqz_group = "Squeeze Momentum"
 sqz_bb_len = input.int(20, "BB Length", group=sqz_group, tooltip="Bollinger Band length for squeeze detection")
 sqz_bb_mult = input.float(2.0, "BB MultFactor", group=sqz_group, tooltip="Bollinger Band standard deviation multiplier")
 sqz_kc_len = input.int(20, "KC Length", group=sqz_group, tooltip="Keltner Channel length for squeeze detection")
@@ -4697,294 +4693,177 @@ bool session_conf_long = false
 bool session_conf_short = false
 
 
-// Confirmation chains and scoring — compact accumulator approach
+// Confirmation chains — compact accumulator approach
 bool longOk = leadinglongcond
 bool shortOk = leadingshortcond
-int long_score = 0
-int short_score = 0
 
 longOk := longOk and (not eff_respectrf or uprf)
 shortOk := shortOk and (not eff_respectrf or downrf)
-long_score += eff_respectrf and uprf ? 1 : 0
-short_score += eff_respectrf and downrf ? 1 : 0
 
 longOk := longOk and (not eff_respectadx or adxupcondition)
 shortOk := shortOk and (not eff_respectadx or adxdowncondition)
-long_score += eff_respectadx and adxupcondition ? 1 : 0
-short_score += eff_respectadx and adxdowncondition ? 1 : 0
 
 longOk := longOk and (not eff_respecttsi or tsi_long)
 shortOk := shortOk and (not eff_respecttsi or tsi_short)
-long_score += eff_respecttsi and tsi_long ? 1 : 0
-short_score += eff_respecttsi and tsi_short ? 1 : 0
 
 longOk := longOk and (not eff_respecthacolt or hacolt_long)
 shortOk := shortOk and (not eff_respecthacolt or hacolt_short)
-long_score += eff_respecthacolt and hacolt_long ? 1 : 0
-short_score += eff_respecthacolt and hacolt_short ? 1 : 0
 
 longOk := longOk and (not eff_respectmd or md_long)
 shortOk := shortOk and (not eff_respectmd or md_short)
-long_score += eff_respectmd and md_long ? 1 : 0
-short_score += eff_respectmd and md_short ? 1 : 0
 
 longOk := longOk and (not eff_respecttdfi or tdfi_long)
 shortOk := shortOk and (not eff_respecttdfi or tdfi_short)
-long_score += eff_respecttdfi and tdfi_long ? 1 : 0
-short_score += eff_respecttdfi and tdfi_short ? 1 : 0
 
 longOk := longOk and (not eff_respectdpo or dpo_long)
 shortOk := shortOk and (not eff_respectdpo or dpo_short)
-long_score += eff_respectdpo and dpo_long ? 1 : 0
-short_score += eff_respectdpo and dpo_short ? 1 : 0
 
 longOk := longOk and (not eff_respectrd or rd_signal)
 shortOk := shortOk and (not eff_respectrd or rd_signal)
-long_score += eff_respectrd and rd_signal ? 1 : 0
-short_score += eff_respectrd and rd_signal ? 1 : 0
 
 longOk := longOk and (not eff_respectci or ci_filter)
 shortOk := shortOk and (not eff_respectci or ci_filter)
-long_score += eff_respectci and ci_filter ? 1 : 0
-short_score += eff_respectci and ci_filter ? 1 : 0
 
 longOk := longOk and (not eff_respectroc or roc_long)
 shortOk := shortOk and (not eff_respectroc or roc_short)
-long_score += eff_respectroc and roc_long ? 1 : 0
-short_score += eff_respectroc and roc_short ? 1 : 0
 
 longOk := longOk and (not eff_respectht or halftrend_long)
 shortOk := shortOk and (not eff_respectht or halftrend_short)
-long_score += eff_respectht and halftrend_long ? 1 : 0
-short_score += eff_respectht and halftrend_short ? 1 : 0
 
 longOk := longOk and (not eff_respectdonchian or donchian_long)
 shortOk := shortOk and (not eff_respectdonchian or donchian_short)
-long_score += eff_respectdonchian and donchian_long ? 1 : 0
-short_score += eff_respectdonchian and donchian_short ? 1 : 0
 
 longOk := longOk and (not eff_respecttrendline_breakout or tb_buysignal)
 shortOk := shortOk and (not eff_respecttrendline_breakout or tb_sellsignal)
-long_score += eff_respecttrendline_breakout and tb_buysignal ? 1 : 0
-short_score += eff_respecttrendline_breakout and tb_sellsignal ? 1 : 0
 
 longOk := longOk and (not eff_respectbbpt or bbpt_long)
 shortOk := shortOk and (not eff_respectbbpt or bbpt_short)
-long_score += eff_respectbbpt and bbpt_long ? 1 : 0
-short_score += eff_respectbbpt and bbpt_short ? 1 : 0
 
 longOk := longOk and (not eff_respectrqk or rqkuptrend)
 shortOk := shortOk and (not eff_respectrqk or rqkdowntrend)
-long_score += eff_respectrqk and rqkuptrend ? 1 : 0
-short_score += eff_respectrqk and rqkdowntrend ? 1 : 0
 
 longOk := longOk and (not eff_respectbx or bx_long)
 shortOk := shortOk and (not eff_respectbx or bx_short)
-long_score += eff_respectbx and bx_long ? 1 : 0
-short_score += eff_respectbx and bx_short ? 1 : 0
 
 longOk := longOk and (not eff_respectbbosc or bbosc_long)
 shortOk := shortOk and (not eff_respectbbosc or bbosc_short)
-long_score += eff_respectbbosc and bbosc_long ? 1 : 0
-short_score += eff_respectbbosc and bbosc_short ? 1 : 0
 
 longOk := longOk and (not eff_respectwae or wae_long)
 shortOk := shortOk and (not eff_respectwae or wae_short)
-long_score += eff_respectwae and wae_long ? 1 : 0
-short_score += eff_respectwae and wae_short ? 1 : 0
 
 longOk := longOk and (not eff_respectce or ce_long)
 shortOk := shortOk and (not eff_respectce or ce_short)
-long_score += eff_respectce and ce_long ? 1 : 0
-short_score += eff_respectce and ce_short ? 1 : 0
 
 longOk := longOk and (not eff_respectssl or ssl_long)
 shortOk := shortOk and (not eff_respectssl or ssl_short)
-long_score += eff_respectssl and ssl_long ? 1 : 0
-short_score += eff_respectssl and ssl_short ? 1 : 0
 
 longOk := longOk and (not eff_respect2ma or ema2_long)
 shortOk := shortOk and (not eff_respect2ma or ema2_short)
-long_score += eff_respect2ma and ema2_long ? 1 : 0
-short_score += eff_respect2ma and ema2_short ? 1 : 0
 
 longOk := longOk and (not eff_respect3ma or ema3_long)
 shortOk := shortOk and (not eff_respect3ma or ema3_short)
-long_score += eff_respect3ma and ema3_long ? 1 : 0
-short_score += eff_respect3ma and ema3_short ? 1 : 0
 
 longOk := longOk and (not eff_respectstochastic or stoch_long)
 shortOk := shortOk and (not eff_respectstochastic or stoch_short)
-long_score += eff_respectstochastic and stoch_long ? 1 : 0
-short_score += eff_respectstochastic and stoch_short ? 1 : 0
 
 longOk := longOk and (not eff_respectcci or ccilong)
 shortOk := shortOk and (not eff_respectcci or ccishort)
-long_score += eff_respectcci and ccilong ? 1 : 0
-short_score += eff_respectcci and ccishort ? 1 : 0
 
 longOk := longOk and (not eff_respectst or isstup)
 shortOk := shortOk and (not eff_respectst or isstdown)
-long_score += eff_respectst and isstup ? 1 : 0
-short_score += eff_respectst and isstdown ? 1 : 0
 
 longOk := longOk and (not eff_respectrsi or rsiup)
 shortOk := shortOk and (not eff_respectrsi or rsidown)
-long_score += eff_respectrsi and rsiup ? 1 : 0
-short_score += eff_respectrsi and rsidown ? 1 : 0
 
 longOk := longOk and (not eff_respectrsimalimit or rsimalimitlong)
 shortOk := shortOk and (not eff_respectrsimalimit or rsimalimitshort)
-long_score += eff_respectrsimalimit and rsimalimitlong ? 1 : 0
-short_score += eff_respectrsimalimit and rsimalimitshort ? 1 : 0
 
 longOk := longOk and (not eff_respectrsilimit or rsilimitlong)
 shortOk := shortOk and (not eff_respectrsilimit or rsilimitshort)
-long_score += eff_respectrsilimit and rsilimitlong ? 1 : 0
-short_score += eff_respectrsilimit and rsilimitshort ? 1 : 0
 
 longOk := longOk and (not eff_respectrsima or rsimalong2)
 shortOk := shortOk and (not eff_respectrsima or rsimashort2)
-long_score += eff_respectrsima and rsimalong2 ? 1 : 0
-short_score += eff_respectrsima and rsimashort2 ? 1 : 0
 
 longOk := longOk and (not eff_respectema or isaboverespectema)
 shortOk := shortOk and (not eff_respectema or isbelowrespectema)
-long_score += eff_respectema and isaboverespectema ? 1 : 0
-short_score += eff_respectema and isbelowrespectema ? 1 : 0
 
 longOk := longOk and (not eff_respectqqe or isqqeabove)
 shortOk := shortOk and (not eff_respectqqe or isqqebelow)
-long_score += eff_respectqqe and isqqeabove ? 1 : 0
-short_score += eff_respectqqe and isqqebelow ? 1 : 0
 
 longOk := longOk and (not eff_respectsar or sarup)
 shortOk := shortOk and (not eff_respectsar or sardown)
-long_score += eff_respectsar and sarup ? 1 : 0
-short_score += eff_respectsar and sardown ? 1 : 0
 
 longOk := longOk and (not eff_respectvol or longvol)
 shortOk := shortOk and (not eff_respectvol or shortvol)
-long_score += eff_respectvol and longvol ? 1 : 0
-short_score += eff_respectvol and shortvol ? 1 : 0
 
 longOk := longOk and (not eff_respectchaikin or chaikin_long)
 shortOk := shortOk and (not eff_respectchaikin or chaikin_short)
-long_score += eff_respectchaikin and chaikin_long ? 1 : 0
-short_score += eff_respectchaikin and chaikin_short ? 1 : 0
 
 longOk := longOk and (not eff_respectvwap or long_vwap)
 shortOk := shortOk and (not eff_respectvwap or short_vwap)
-long_score += eff_respectvwap and long_vwap ? 1 : 0
-short_score += eff_respectvwap and short_vwap ? 1 : 0
 
 longOk := longOk and (not eff_respectvo or vo_long)
 shortOk := shortOk and (not eff_respectvo or vo_short)
-long_score += eff_respectvo and vo_long ? 1 : 0
-short_score += eff_respectvo and vo_short ? 1 : 0
 
 longOk := longOk and (not eff_respectao or ao_long)
 shortOk := shortOk and (not eff_respectao or ao_short)
-long_score += eff_respectao and ao_long ? 1 : 0
-short_score += eff_respectao and ao_short ? 1 : 0
 
 longOk := longOk and (not eff_respectsuperichi or superichi_long)
 shortOk := shortOk and (not eff_respectsuperichi or superichi_short)
-long_score += eff_respectsuperichi and superichi_long ? 1 : 0
-short_score += eff_respectsuperichi and superichi_short ? 1 : 0
 
 longOk := longOk and (not eff_respectwolf or wolf_long)
 shortOk := shortOk and (not eff_respectwolf or wolf_short)
-long_score += eff_respectwolf and wolf_long ? 1 : 0
-short_score += eff_respectwolf and wolf_short ? 1 : 0
 
 longOk := longOk and (not eff_respectichi or ichi_long)
 shortOk := shortOk and (not eff_respectichi or ichi_short)
-long_score += eff_respectichi and ichi_long ? 1 : 0
-short_score += eff_respectichi and ichi_short ? 1 : 0
 
 longOk := longOk and (not eff_respectmacd or ismacdup)
 shortOk := shortOk and (not eff_respectmacd or ismacddown)
-long_score += eff_respectmacd and ismacdup ? 1 : 0
-short_score += eff_respectmacd and ismacddown ? 1 : 0
 
 longOk := longOk and (not eff_respecthull or hullup)
 shortOk := shortOk and (not eff_respecthull or hulldown)
-long_score += eff_respecthull and hullup ? 1 : 0
-short_score += eff_respecthull and hulldown ? 1 : 0
 
 longOk := longOk and (not eff_respectvi or vipcondition)
 shortOk := shortOk and (not eff_respectvi or vimcondition)
-long_score += eff_respectvi and vipcondition ? 1 : 0
-short_score += eff_respectvi and vimcondition ? 1 : 0
 
 longOk := longOk and (not eff_respectstc or stcup)
 shortOk := shortOk and (not eff_respectstc or stcdown)
-long_score += eff_respectstc and stcup ? 1 : 0
-short_score += eff_respectstc and stcdown ? 1 : 0
 
 longOk := longOk and (not eff_respectdv or dvup)
 shortOk := shortOk and (not eff_respectdv or dvup)
-long_score += eff_respectdv and dvup ? 1 : 0
-short_score += eff_respectdv and dvup ? 1 : 0
 
 longOk := longOk and (not eff_respectsmc or smc_conf_long)
 shortOk := shortOk and (not eff_respectsmc or smc_conf_short)
-long_score += eff_respectsmc and smc_conf_long ? 1 : 0
-short_score += eff_respectsmc and smc_conf_short ? 1 : 0
 
 longOk := longOk and (not eff_respectsmc_htf or smc_htf_conf_long)
 shortOk := shortOk and (not eff_respectsmc_htf or smc_htf_conf_short)
-long_score += eff_respectsmc_htf and smc_htf_conf_long ? 1 : 0
-short_score += eff_respectsmc_htf and smc_htf_conf_short ? 1 : 0
 
 longOk := longOk and (not eff_respectob_mit or smc_ob_bear_mitigated)
 shortOk := shortOk and (not eff_respectob_mit or smc_ob_bull_mitigated)
-long_score += eff_respectob_mit and smc_ob_bear_mitigated ? 1 : 0
-short_score += eff_respectob_mit and smc_ob_bull_mitigated ? 1 : 0
 
 longOk := longOk and (not eff_respectbc or bc_bullishBreakout)
 shortOk := shortOk and (not eff_respectbc or bc_bearishBreakout)
-long_score += eff_respectbc and bc_bullishBreakout ? 1 : 0
-short_score += eff_respectbc and bc_bearishBreakout ? 1 : 0
 
 longOk := longOk and (not eff_respectvix or vix_conf_long)
 shortOk := shortOk and (not eff_respectvix or vix_conf_short)
-long_score += eff_respectvix and vix_conf_long ? 1 : 0
-short_score += eff_respectvix and vix_conf_short ? 1 : 0
 
 longOk := longOk and (not eff_respectsqz or sqz_conf_long)
 shortOk := shortOk and (not eff_respectsqz or sqz_conf_short)
-long_score += eff_respectsqz and sqz_conf_long ? 1 : 0
-short_score += eff_respectsqz and sqz_conf_short ? 1 : 0
 
 longOk := longOk and (not eff_respectsqz_active or sqz_active_conf_long)
 shortOk := shortOk and (not eff_respectsqz_active or sqz_active_conf_short)
-long_score += eff_respectsqz_active and sqz_active_conf_long ? 1 : 0
-short_score += eff_respectsqz_active and sqz_active_conf_short ? 1 : 0
 
 longOk := longOk and (not eff_respectsession or session_conf_long)
 shortOk := shortOk and (not eff_respectsession or session_conf_short)
-long_score += eff_respectsession and session_conf_long ? 1 : 0
-short_score += eff_respectsession and session_conf_short ? 1 : 0
 
 longOk := longOk and (not eff_respectfv_ob or fv_ob_conf_long)
 shortOk := shortOk and (not eff_respectfv_ob or fv_ob_conf_short)
-long_score += eff_respectfv_ob and fv_ob_conf_long ? 1 : 0
-short_score += eff_respectfv_ob and fv_ob_conf_short ? 1 : 0
 
 longOk := longOk and (not eff_respecttm or tm_conf_long)
 shortOk := shortOk and (not eff_respecttm or tm_conf_short)
-long_score += eff_respecttm and tm_conf_long ? 1 : 0
-short_score += eff_respecttm and tm_conf_short ? 1 : 0
 
-// Apply scoring or AND-chain mode
-if use_signal_scoring
-    longCond := leadinglongcond and long_score >= signal_score_threshold
-    shortCond := leadingshortcond and short_score >= signal_score_threshold
-else
-    longCond := longOk
-    shortCond := shortOk
+	longCond := longOk
+	shortCond := shortOk
 
  
 
@@ -5275,8 +5154,6 @@ alertcondition(tm_short, 'Trend Meter Bearish Align', 'Trend meters aligned bear
 // ============================================================================
 plot(longCondition ? 1 : 0, "Long Signal", display=display.data_window)
 plot(shortCondition ? -1 : 0, "Short Signal", display=display.data_window)
-plot(use_signal_scoring ? long_score : na, "Long Score", display=display.data_window)
-plot(use_signal_scoring ? short_score : na, "Short Score", display=display.data_window)
 plot(smc_conf_long ? 1 : smc_conf_short ? -1 : 0, "SMC Bias", display=display.data_window)
 plot(smc_htf_conf_long ? 1 : smc_htf_conf_short ? -1 : 0, "SMC HTF Bias", display=display.data_window)
 plot(vix_conf_long ? 1 : vix_conf_short ? -1 : 0, "Vix Fix Bias", display=display.data_window)
