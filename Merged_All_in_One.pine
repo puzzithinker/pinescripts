@@ -4469,8 +4469,8 @@ plotshape(eff_switch_squeeze and sqzOff and sqz_val < 0 ? low : na, "Squeeze Rel
 
 
 
-longCond = false
-shortCond = false
+bool longCond = false
+bool shortCond = false
 
 
 longCond2 = false
