@@ -117,7 +117,7 @@ alternatesignal = input.bool (true, "Alternate Signal", group=setup_group, inlin
 showsignal = input.bool (true, "Show Long/Short Signal", group=setup_group,inline='showsignal')
 
 showdashboard = input.bool (true, "Show Dashboard", group=setup_group,inline='dashboard')
-string preset = input.string("Custom", "Preset", group=setup_group, options=["Custom", "SMC Scalper", "Trend Follower", "Breakout Trader", "All Filters"])
+string preset = input.string("SMC Scalper", "Preset", group=setup_group, options=["Custom", "SMC Scalper", "Trend Follower", "Breakout Trader", "All Filters"])
 string i_tab1Ypos = input.string('bottom', 'Dashboard Position',group=setup_group, inline='dashboard2', options=['top', 'middle', 'bottom'])
 string i_tab1Xpos = input.string('right', '', inline='dashboard2', group=setup_group,options=['left', 'center', 'right'])
 in_dashboardtab_size = input.string(title="Dashboard Size    ", defval="Normal", 
@@ -384,7 +384,7 @@ bool eff_respecttm         = is_all_filters or respecttm
 ////////////////////////////////////////////////////////////////////////
 
 switchboard_group = "Switch Board (Turn On/Off Overlay Indicators)"
-switch_ema = input.bool (false, "EMA", group=switchboard_group, inline='Switch1')
+switch_ema = input.bool (true, "EMA", group=switchboard_group, inline='Switch1')
 show_ema_cross = input.bool(true, "EMA Cross Signals", group=switchboard_group, inline='Switch1')
 switch_poi = input.bool (true, "Supply/Demand Zone", group=switchboard_group, inline='Switch1')
 switch_sar = input.bool (false, "PSAR", group=switchboard_group, inline='Switch1')
@@ -408,7 +408,7 @@ switch_rangefilter = input.bool (false, "Range Filter", group=switchboard_group,
 switch_stc = input.bool (false, "STC", group=switchboard_group, inline='Switch3')
 switch_pvsra = input.bool (true, "PVSRA", group=switchboard_group, inline='Switch3')
 switch_vectorzone = input.bool (false, "Liquidity Zone", group=switchboard_group, inline='Switch3')
-switch_fvg = input.bool (false, "Fair Value Gap (FVG)", group=switchboard_group, inline='Switch4')
+switch_fvg = input.bool (true, "Fair Value Gap (FVG)", group=switchboard_group, inline='Switch4')
 switch_pivot = input.bool (false, "Pivot Levels", group=switchboard_group, inline='Switch4')
 switch_fractal = input.bool (false, "Fractal", group=switchboard_group, inline='Switch4')
 
