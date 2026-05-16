@@ -715,7 +715,6 @@ if switch_ema
 
 plot(len1bool and switch_ema? ema1:na, color=ma_1_colour, linewidth=2, title='MA 1')
 plot(len2bool and switch_ema? ema2:na, color=ma_2_colour, linewidth=2, title='MA 2')
-plot(len3bool and switch_ema? ema3:na, color=ma_3_colour, linewidth=2, title='MA 3')
 plot(len4bool and switch_ema? ema4:na, color=ma_4_colour, linewidth=2, title='MA 4')
 plot(len5bool and switch_ema? ema5:na, color=ma_5_colour, linewidth=2, title='MA 5')
 
@@ -2162,8 +2161,7 @@ rd_signal = close > rd_max or close < rd_min
 //-----------------------------------------------------------------------------}
 //Plots
 //-----------------------------------------------------------------------------{
-//Range detection bgcolor
-bgcolor(detect_css)
+//Range detection
 
 plot(switch_rd? rd_max:na, 'Range Top'
   , rd_max != rd_max[1] ? na : rd_os == 0 ? unbrokenCss : rd_os == 1 ? rd_upCss : rd_dnCss)
@@ -2918,7 +2916,6 @@ if switch_pvsra
                 imbalancedLineColor := na
 
 barcolor(overideCandleColours and switch_pvsra ? candleColor : NO_COLOR)
-plotcandle(open, high, low, close, color=(overideCandleColours and switch_pvsra ? candleColor : NO_COLOR), wickcolor=(overideCandleColours and switch_pvsra? candleColor : NO_COLOR), bordercolor=(overideCandleColours and switch_pvsra? candleColor : NO_COLOR), display = display.all)
 
 
 ///////////////////////////////////////////////////
@@ -3240,12 +3237,7 @@ bars            = candletype == "Bars"
 candle          = candletype == "Candles"
 
 
-plotcandle(
-  hkOpen, hkHigh, hkLow, hkClose, 
-  "Hollow Candles",
-  switch_ha ? (hollow ? hkClose < hkOpen ? BodyBear : na : candle ? hkClose < hkOpen ? BodyBear : BodyBull : na) : na,
-  switch_ha ? (hollow or candle ? hkClose < hkOpen ? WickBear : WickBull : na) : na,
-  bordercolor = switch_ha ? (hollow or candle ? hkClose < hkOpen ? BorderBear : BorderBull : na) : na)
+barcolor(switch_ha and hkClose >= hkOpen ? BodyBull : switch_ha ? BodyBear : na)
 
 
 
@@ -3379,7 +3371,6 @@ if switch_vectorzone
     pvsraColor := _pvsraColor
 
 
-barcolor(setcandlecolors ? pvsraColor : na)
 pvsra = trLib.getPvsraFlagByColor(switch_vectorzone ? pvsraColor:na, redVectorColor, greenVectorColor, violetVectorColor, blueVectorColor, regularCandleUpColor)
 trLib.updateZones(pvsra, 0, zoneBoxesBelow, zonesMax, pvsraHigh, pvsraLow, pvsraOpen, pvsraClose, transperancy, zoneUpdateType, zoneColor, zoneType, borderWidth, colorOverride, redVectorColor, greenVectorColor, violetVectorColor, blueVectorColor)
 trLib.updateZones(pvsra, 1, zoneBoxesAbove, zonesMax, pvsraHigh, pvsraLow, pvsraOpen, pvsraClose, transperancy, zoneUpdateType, zoneColor, zoneType, borderWidth, colorOverride, redVectorColor, greenVectorColor, violetVectorColor, blueVectorColor)
@@ -5114,31 +5105,11 @@ if showdashboard and barstate.islast
 
 // SMC Alerts
 alertcondition(smc_currentAlerts.swingBullishBOS, 'SMC Bullish BOS', 'Swing Bullish BOS formed')
-alertcondition(smc_currentAlerts.swingBullishCHoCH, 'SMC Bullish CHoCH', 'Swing Bullish CHoCH formed')
 alertcondition(smc_currentAlerts.swingBearishBOS, 'SMC Bearish BOS', 'Swing Bearish BOS formed')
-alertcondition(smc_currentAlerts.swingBearishCHoCH, 'SMC Bearish CHoCH', 'Swing Bearish CHoCH formed')
-alertcondition(smc_currentAlerts.equalHighs, 'SMC Equal Highs', 'Equal highs detected')
-alertcondition(smc_currentAlerts.equalLows, 'SMC Equal Lows', 'Equal lows detected')
-alertcondition(smc_htf_conf_long and smc_htf_conf_long[1] != true, 'SMC HTF Trend Bullish', 'Higher-timeframe SMC trend turned bullish')
-alertcondition(smc_htf_conf_short and smc_htf_conf_short[1] != true, 'SMC HTF Trend Bearish', 'Higher-timeframe SMC trend turned bearish')
-alertcondition(smc_ob_bear_mitigated, 'SMC Bearish OB Mitigated', 'Bearish order block was mitigated - bullish signal')
-alertcondition(smc_ob_bull_mitigated, 'SMC Bullish OB Mitigated', 'Bullish order block was mitigated - bearish signal')
-alertcondition(fv_ob_conf_long, 'FVG-OB Bullish Confluence', 'Price in bullish FVG-OB confluence zone')
-alertcondition(fv_ob_conf_short, 'FVG-OB Bearish Confluence', 'Price in bearish FVG-OB confluence zone')
-alertcondition(bc_bullishBreakout, 'BC Bullish Breakout', 'Price broke above channel')
-alertcondition(bc_bearishBreakout, 'BC Bearish Breakout', 'Price broke below channel')
-alertcondition(bc_newChannel, 'BC New Channel', 'New breakout channel formed')
 alertcondition(vix_long, 'Vix Fix Bottom Signal', 'Potential market bottom detected')
 alertcondition(vix_short, 'Vix Fix Exhaustion Signal', 'Vix Fix dropped from elevated - exhaustion')
-alertcondition(sqz_long, 'Squeeze Release Bull', 'Squeeze released with bullish momentum')
-alertcondition(sqz_short, 'Squeeze Release Bear', 'Squeeze released with bearish momentum')
-alertcondition(ema_cross_up, 'EMA Cross Up', 'Fast MA crossed above Slow MA')
-alertcondition(ema_cross_dn, 'EMA Cross Down', 'Fast MA crossed below Slow MA')
-alertcondition(tm_long, 'Trend Meter Bullish Align', 'Trend meters aligned bullish')
-alertcondition(tm_short, 'Trend Meter Bearish Align', 'Trend meters aligned bearish')
+alertcondition(bc_bullishBreakout, 'BC Bullish Breakout', 'Price broke above channel')
+alertcondition(bc_bearishBreakout, 'BC Bearish Breakout', 'Price broke below channel')
 
 // ============================================================================
-// Data Window Outputs (for external strategy consumption)
-// ============================================================================
-plot(longCondition ? 1 : 0, "Long Signal", display=display.data_window)
-plot(shortCondition ? -1 : 0, "Short Signal", display=display.data_window)
+// Data Window Outputs removed to save plot slots
