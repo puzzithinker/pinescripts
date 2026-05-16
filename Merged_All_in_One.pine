@@ -4859,8 +4859,8 @@ shortOk := shortOk and (not eff_respectfv_ob or fv_ob_conf_short)
 longOk := longOk and (not eff_respecttm or tm_conf_long)
 shortOk := shortOk and (not eff_respecttm or tm_conf_short)
 
-	longCond := longOk
-	shortCond := shortOk
+longCond := longOk
+shortCond := shortOk
 
  
 
