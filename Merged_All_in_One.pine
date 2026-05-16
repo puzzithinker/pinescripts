@@ -5037,8 +5037,9 @@ getFalseShortConditionItems(arrShort) =>
 
 labelShortCondition = showsignal and is_expiry_count_crossed_short and not is_expiry_count_crossed_short[1] and CondIni == 1
 
+string falseShortConditionString = ""
 if labelShortCondition
-    falseShortConditionString = getFalseShortConditionItems(confirmation_val_short) + "\n" + "--------------------------"
+    falseShortConditionString := getFalseShortConditionItems(confirmation_val_short) + "\n" + "--------------------------"
     label.new(bar_index, low, "🔴", color=color.new(#dd1111, 0), textcolor=color.white, style=label.style_none, yloc=yloc.belowbar, size=size.small)
 
 
@@ -5054,8 +5055,9 @@ getFalseLongConditionItems(arr) =>
 
 labelCondition = showsignal and is_expiry_count_crossed_long and not is_expiry_count_crossed_long[1] and CondIni == -1
 
+string falseLongConditionString = ""
 if labelCondition
-    falseLongConditionString = getFalseLongConditionItems(confirmation_val) + "\n" + "--------------------------"
+    falseLongConditionString := getFalseLongConditionItems(confirmation_val) + "\n" + "--------------------------"
     label.new(bar_index, high, "🔴", color=color.new(color.green, 0), textcolor=color.white, style=label.style_none, yloc=yloc.abovebar, size=size.small)
 
 
