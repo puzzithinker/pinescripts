@@ -3630,17 +3630,11 @@ else // month == 11
 
 
 _sess1gmt = ukDST ? 'GMT+1' : 'GMT+0'
-if ukDST
-    draw_open_range(sess1Time,sess1col,show_or1,'GMT+1')
-else
-    draw_open_range(sess1Time,sess1col,show_or1,'GMT+0')
+draw_open_range(sess1Time,sess1col,show_or1,_sess1gmt)
 draw_session_hilo(sess1Time, show_rectangle1, show_label1, sess1colLabel, sess1Label, _sess1gmt)
 
 _sess2gmt = nyDST ? 'GMT+1' : 'GMT+0'
-if nyDST
-    draw_open_range(sess2Time,sess2col,show_or2,'GMT+1')
-else
-    draw_open_range(sess2Time,sess2col,show_or2,'GMT+0')
+draw_open_range(sess2Time,sess2col,show_or2,_sess2gmt)
 draw_session_hilo(sess2Time, show_rectangle2, show_label2, sess2colLabel, sess2Label, _sess2gmt)
 
 // Tokyo
@@ -3652,18 +3646,12 @@ draw_open_range(sess4Time,sess4col,show_or4,'GMT+0')
 draw_session_hilo(sess4Time, show_rectangle4, show_label4, sess4colLabel, sess4Label, 'GMT+0')
 
 _sess5gmt = sydDST ? 'GMT+1' : 'GMT+0'
-if sydDST
-    draw_open_range(sess5Time,sess5col,show_or5,'GMT+1')
-else
-    draw_open_range(sess5Time,sess5col,show_or5,'GMT+0')
+draw_open_range(sess5Time,sess5col,show_or5,_sess5gmt)
 draw_session_hilo(sess5Time, show_rectangle5, show_label5, sess5colLabel, sess5Label, _sess5gmt)
 
 
 _sess7gmt = nyDST ? 'GMT+1' : 'GMT+0'
-if nyDST
-    draw_open_range(sess7Time,sess7col,show_or7,'GMT+1')
-else
-    draw_open_range(sess7Time,sess7col,show_or7,'GMT+0')
+draw_open_range(sess7Time,sess7col,show_or7,_sess7gmt)
 draw_session_hilo(sess7Time, show_rectangle7, show_label7, sess7colLabel, sess7Label, _sess7gmt)
 
 
