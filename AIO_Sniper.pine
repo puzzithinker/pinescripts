@@ -162,7 +162,7 @@ smc_intBearColor = smc_style == "Monochrome" ? SMC_MONO_BEAR : smc_int_bear_colo
 
 // ── Volatility ────────────────────────────────────────────────────────────────
 smc_atr = ta.atr(200)
-smc_volMeasure = ta.cum(ta.tr) / bar_index
+smc_volMeasure = bar_index > 0 ? ta.cum(ta.tr) / bar_index : ta.tr
 smc_highVolBar = (high - low) >= (2 * smc_volMeasure)
 smc_parsedHigh = smc_highVolBar ? low : high
 smc_parsedLow = smc_highVolBar ? high : low
@@ -184,7 +184,7 @@ smc_drawLabel(int labelTime, float labelPrice, string tag, color labelColor, str
     var label l_abel = na
     if smc_mode == "Present"
         l_abel.delete()
-    l_abel := label.new(chart.point.new(labelTime, na, labelPrice), tag, xloc.bar_time, color=color(na), textcolor=labelColor, style=labelStyle, size=size.small)
+    l_abel := label.new(chart.point.from_time(labelTime, labelPrice), tag, xloc.bar_time, color=color(na), textcolor=labelColor, style=labelStyle, size=size.small)
 
 smc_drawStructure(smc_pivot p_ivot, string tag, color structureColor, string lineStyle, string labelStyle, string labelSize) =>
     var line l_ine = line.new(na, na, na, na, xloc=xloc.bar_time)
@@ -192,8 +192,8 @@ smc_drawStructure(smc_pivot p_ivot, string tag, color structureColor, string lin
     if smc_mode == "Present"
         l_ine.delete()
         l_abel.delete()
-    l_ine := line.new(chart.point.new(p_ivot.barTime, na, p_ivot.currentLevel), chart.point.new(time, na, p_ivot.currentLevel), xloc.bar_time, color=structureColor, style=lineStyle)
-    l_abel := label.new(chart.point.new(na, math.round(0.5 * (p_ivot.barIndex + bar_index)), p_ivot.currentLevel), tag, xloc.bar_index, color=color(na), textcolor=structureColor, style=labelStyle, size=labelSize)
+    l_ine := line.new(chart.point.from_time(p_ivot.barTime, p_ivot.currentLevel), chart.point.from_time(time, p_ivot.currentLevel), xloc.bar_time, color=structureColor, style=lineStyle)
+    l_abel := label.new(chart.point.from_index(math.round(0.5 * (p_ivot.barIndex + bar_index)), p_ivot.currentLevel), tag, xloc.bar_index, color=color(na), textcolor=structureColor, style=labelStyle, size=labelSize)
 
 smc_drawEqualHL(smc_pivot p_ivot, float level, int size, bool equalHigh) =>
     smc_equalDisplay e_Display = equalHigh ? smc_eqHighDisplay : smc_eqLowDisplay
@@ -203,8 +203,8 @@ smc_drawEqualHL(smc_pivot p_ivot, float level, int size, bool equalHigh) =>
     if smc_mode == "Present"
         line.delete(e_Display.l_ine)
         label.delete(e_Display.l_abel)
-    e_Display.l_ine := line.new(chart.point.new(p_ivot.barTime, na, p_ivot.currentLevel), chart.point.new(time[size], na, level), xloc.bar_time, color=eqColor, style=line.style_dotted)
-    e_Display.l_abel := label.new(chart.point.new(na, math.round(0.5 * (p_ivot.barIndex + bar_index - size)), level), tag, xloc.bar_index, color=color(na), textcolor=eqColor, style=lStyle, size=size.tiny)
+    e_Display.l_ine := line.new(chart.point.from_time(p_ivot.barTime, p_ivot.currentLevel), chart.point.from_time(time[size], level), xloc.bar_time, color=eqColor, style=line.style_dotted)
+    e_Display.l_abel := label.new(chart.point.from_index(math.round(0.5 * (p_ivot.barIndex + bar_index - size)), level), tag, xloc.bar_index, color=color(na), textcolor=eqColor, style=lStyle, size=size.tiny)
 
 smc_storeOB(smc_pivot p_ivot, bool internal, int bias) =>
     int ob_lookback = bar_index - p_ivot.barIndex
@@ -254,8 +254,8 @@ smc_drawOBs(bool internal, float pd_mid) =>
             obColor = internal ? (eachOB.bias == SMC_BEARISH ? color.new(#f77c80, 80) : color.new(#3179f5, 80)) : (eachOB.bias == SMC_BEARISH ? color.new(#b22833, 80) : color.new(#1848cc, 80))
             if index < b_oxes.size()
                 box b = b_oxes.get(index)
-                b.set_top_left_point(chart.point.new(eachOB.barTime, na, eachOB.barHigh))
-                b.set_bottom_right_point(chart.point.new(last_bar_time, na, eachOB.barLow))
+                b.set_top_left_point(chart.point.from_time(eachOB.barTime, eachOB.barHigh))
+                b.set_bottom_right_point(chart.point.from_time(last_bar_time, eachOB.barLow))
                 b.set_bgcolor(obColor)
 
 smc_deleteFVGs() =>
@@ -374,8 +374,8 @@ bool fv_ob_conf_short = false
 if barstate.isfirst
     if smc_show_ob
         for i = 1 to smc_ob_size
-            smc_swingOBBoxes.push(box.new(na, na, na, na, xloc=xloc.bar_time, extend=extend.right))
-            smc_internalOBBoxes.push(box.new(na, na, na, na, xloc=xloc.bar_time, extend=extend.right))
+            smc_swingOBBoxes.push(box.new(na, na, na, na, extend=extend.right))
+            smc_internalOBBoxes.push(box.new(na, na, na, na, extend=extend.right))
 
 // Update trailing
 if smc_show_hl
@@ -433,18 +433,18 @@ if smc_show_ob and smc_show_fvg
 
 // Draw Strong/Weak H/L
 if smc_show_hl and (barstate.islastconfirmedhistory or barstate.islast)
-    var line smc_topLine = line.new(na, na, na, na, color=smc_swingBearColor, xloc=xloc.bar_time)
-    var line smc_botLine = line.new(na, na, na, na, color=smc_swingBullColor, xloc=xloc.bar_time)
-    var label smc_topLabel = label.new(na, na, color=color(na), textcolor=smc_swingBearColor, xloc=xloc.bar_time, style=label.style_label_down, size=size.tiny)
-    var label smc_botLabel = label.new(na, na, color=color(na), textcolor=smc_swingBullColor, xloc=xloc.bar_time, style=label.style_label_up, size=size.tiny)
-    rightTime = last_bar_time + 20 * (time - time[1])
-    smc_topLine.set_first_point(chart.point.new(smc_trailing.lastTopTime, na, smc_trailing.top))
-    smc_topLine.set_second_point(chart.point.new(rightTime, na, smc_trailing.top))
-    smc_topLabel.set_point(chart.point.new(rightTime, na, smc_trailing.top))
+    var line smc_topLine = line.new(na, na, na, na, color=smc_swingBearColor)
+    var line smc_botLine = line.new(na, na, na, na, color=smc_swingBullColor)
+    var label smc_topLabel = label.new(na, na, color=color(na), textcolor=smc_swingBearColor, style=label.style_label_down, size=size.tiny)
+    var label smc_botLabel = label.new(na, na, color=color(na), textcolor=smc_swingBullColor, style=label.style_label_up, size=size.tiny)
+    int hl_right = bar_index + 20
+    smc_topLine.set_first_point(chart.point.from_index(bar_index - 50, smc_trailing.top))
+    smc_topLine.set_second_point(chart.point.from_index(hl_right, smc_trailing.top))
+    smc_topLabel.set_point(chart.point.from_index(hl_right, smc_trailing.top))
     smc_topLabel.set_text(smc_swingTrend.bias == SMC_BEARISH ? 'Strong High' : 'Weak High')
-    smc_botLine.set_first_point(chart.point.new(smc_trailing.lastBottomTime, na, smc_trailing.bottom))
-    smc_botLine.set_second_point(chart.point.new(rightTime, na, smc_trailing.bottom))
-    smc_botLabel.set_point(chart.point.new(rightTime, na, smc_trailing.bottom))
+    smc_botLine.set_first_point(chart.point.from_index(bar_index - 50, smc_trailing.bottom))
+    smc_botLine.set_second_point(chart.point.from_index(hl_right, smc_trailing.bottom))
+    smc_botLabel.set_point(chart.point.from_index(hl_right, smc_trailing.bottom))
     smc_botLabel.set_text(smc_swingTrend.bias == SMC_BULLISH ? 'Strong Low' : 'Weak Low')
 
 // SMC signals
@@ -463,8 +463,8 @@ smc_conf_short := smc_swingTrend.bias == SMC_BEARISH
 if show_pd_zones and not na(pd_mid) and (barstate.islastconfirmedhistory or barstate.islast)
     float swHigh = smc_swingHigh.currentLevel
     float swLow = smc_swingLow.currentLevel
-    rightTime = last_bar_time + 20 * (time - time[1])
-
+    int rightEdge = bar_index + 20
+    int leftEdge = bar_index - 50
     var box pd_premiumBox = box.new(na, na, na, na, border_color=na, bgcolor=pd_premium_color)
     var box pd_discountBox = box.new(na, na, na, na, border_color=na, bgcolor=pd_discount_color)
     var line pd_midLine = line.new(na, na, na, na, color=pd_midline_color, style=line.style_dashed)
@@ -475,29 +475,29 @@ if show_pd_zones and not na(pd_mid) and (barstate.islastconfirmedhistory or bars
     var label pd_botLabel = label.new(na, na, color=color(na), textcolor=pd_boundary_color, style=label.style_label_left, size=size.tiny)
 
     // Premium box: from mid to swing high
-    pd_premiumBox.set_top_left_point(chart.point.new(bar_index - 50, na, swHigh))
-    pd_premiumBox.set_bottom_right_point(chart.point.new(rightTime, na, pd_mid))
+    pd_premiumBox.set_top_left_point(chart.point.from_index(leftEdge, swHigh))
+    pd_premiumBox.set_bottom_right_point(chart.point.from_index(rightEdge, pd_mid))
     pd_premiumBox.set_bgcolor(pd_premium_color)
 
     // Discount box: from mid to swing low
-    pd_discountBox.set_top_left_point(chart.point.new(bar_index - 50, na, pd_mid))
-    pd_discountBox.set_bottom_right_point(chart.point.new(rightTime, na, swLow))
+    pd_discountBox.set_top_left_point(chart.point.from_index(leftEdge, pd_mid))
+    pd_discountBox.set_bottom_right_point(chart.point.from_index(rightEdge, swLow))
     pd_discountBox.set_bgcolor(pd_discount_color)
 
     // Lines
-    pd_midLine.set_first_point(chart.point.new(bar_index - 50, na, pd_mid))
-    pd_midLine.set_second_point(chart.point.new(rightTime, na, pd_mid))
-    pd_topLine.set_first_point(chart.point.new(bar_index - 50, na, swHigh))
-    pd_topLine.set_second_point(chart.point.new(rightTime, na, swHigh))
-    pd_botLine.set_first_point(chart.point.new(bar_index - 50, na, swLow))
-    pd_botLine.set_second_point(chart.point.new(rightTime, na, swLow))
+    pd_midLine.set_first_point(chart.point.from_index(leftEdge, pd_mid))
+    pd_midLine.set_second_point(chart.point.from_index(rightEdge, pd_mid))
+    pd_topLine.set_first_point(chart.point.from_index(leftEdge, swHigh))
+    pd_topLine.set_second_point(chart.point.from_index(rightEdge, swHigh))
+    pd_botLine.set_first_point(chart.point.from_index(leftEdge, swLow))
+    pd_botLine.set_second_point(chart.point.from_index(rightEdge, swLow))
 
     // Labels
-    pd_midLabel.set_point(chart.point.new(rightTime, na, pd_mid))
+    pd_midLabel.set_point(chart.point.from_index(rightEdge, pd_mid))
     pd_midLabel.set_text("50%")
-    pd_topLabel.set_point(chart.point.new(rightTime, na, swHigh))
+    pd_topLabel.set_point(chart.point.from_index(rightEdge, swHigh))
     pd_topLabel.set_text("100% Premium")
-    pd_botLabel.set_point(chart.point.new(rightTime, na, swLow))
+    pd_botLabel.set_point(chart.point.from_index(rightEdge, swLow))
     pd_botLabel.set_text("0% Discount")
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -520,19 +520,20 @@ else
     current_day_low := math.min(nz(current_day_low, low), low)
 
 if show_pdh_pdl and not na(prev_day_high) and (barstate.islastconfirmedhistory or barstate.islast)
-    rightTime = last_bar_time + 20 * (time - time[1])
+    int pdh_left = bar_index - 50
+    int pdh_right = bar_index + 20
     var line pdh_line = line.new(na, na, na, na, color=pdh_pdl_color, style=line.style_dashed)
     var line pdl_line = line.new(na, na, na, na, color=pdh_pdl_color, style=line.style_dashed)
     var label pdh_label = label.new(na, na, color=color(na), textcolor=pdh_pdl_color, style=label.style_label_left, size=size.tiny)
     var label pdl_label = label.new(na, na, color=color(na), textcolor=pdh_pdl_color, style=label.style_label_left, size=size.tiny)
 
-    pdh_line.set_first_point(chart.point.new(bar_index - 50, na, prev_day_high))
-    pdh_line.set_second_point(chart.point.new(rightTime, na, prev_day_high))
-    pdl_line.set_first_point(chart.point.new(bar_index - 50, na, prev_day_low))
-    pdl_line.set_second_point(chart.point.new(rightTime, na, prev_day_low))
-    pdh_label.set_point(chart.point.new(rightTime, na, prev_day_high))
+    pdh_line.set_first_point(chart.point.from_index(pdh_left, prev_day_high))
+    pdh_line.set_second_point(chart.point.from_index(pdh_right, prev_day_high))
+    pdl_line.set_first_point(chart.point.from_index(pdh_left, prev_day_low))
+    pdl_line.set_second_point(chart.point.from_index(pdh_right, prev_day_low))
+    pdh_label.set_point(chart.point.from_index(pdh_right, prev_day_high))
     pdh_label.set_text("PDH")
-    pdl_label.set_point(chart.point.new(rightTime, na, prev_day_low))
+    pdl_label.set_point(chart.point.from_index(pdh_right, prev_day_low))
     pdl_label.set_text("PDL")
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -552,31 +553,31 @@ else if not na(hsi_session)
     sess_low := math.min(nz(sess_low, low), low)
 
 if show_session_hl and not na(sess_high) and not na(hsi_session) and (barstate.islastconfirmedhistory or barstate.islast)
+    int sess_left = bar_index - 20
+    int sess_right = bar_index + 20
     var line sess_h_line = line.new(na, na, na, na, color=session_hl_color, style=line.style_solid)
     var line sess_l_line = line.new(na, na, na, na, color=session_hl_color, style=line.style_solid)
     var label sess_h_label = label.new(na, na, color=color(na), textcolor=session_hl_color, style=label.style_label_left, size=size.tiny)
     var label sess_l_label = label.new(na, na, color=color(na), textcolor=session_hl_color, style=label.style_label_left, size=size.tiny)
 
-    rightTime = last_bar_time + 20 * (time - time[1])
-    sess_h_line.set_first_point(chart.point.new(bar_index - 20, na, sess_high))
-    sess_h_line.set_second_point(chart.point.new(rightTime, na, sess_high))
-    sess_l_line.set_first_point(chart.point.new(bar_index - 20, na, sess_low))
-    sess_l_line.set_second_point(chart.point.new(rightTime, na, sess_low))
-    sess_h_label.set_point(chart.point.new(rightTime, na, sess_high))
+    sess_h_line.set_first_point(chart.point.from_index(sess_left, sess_high))
+    sess_h_line.set_second_point(chart.point.from_index(sess_right, sess_high))
+    sess_l_line.set_first_point(chart.point.from_index(sess_left, sess_low))
+    sess_l_line.set_second_point(chart.point.from_index(sess_right, sess_low))
+    sess_h_label.set_point(chart.point.from_index(sess_right, sess_high))
     sess_h_label.set_text("Session H")
-    sess_l_label.set_point(chart.point.new(rightTime, na, sess_low))
+    sess_l_label.set_point(chart.point.from_index(sess_right, sess_low))
     sess_l_label.set_text("Session L")
 
 // ══════════════════════════════════════════════════════════════════════════════
 // KILL ZONES & GARBAGE TIME
 // ══════════════════════════════════════════════════════════════════════════════
 
-if show_kz
-    in_kz1 = kz1_on and not na(time(timeframe.period, kz1_time, kz_timezone))
-    in_gt1 = gt1_on and not na(time(timeframe.period, gt1_time, kz_timezone))
-    in_kz2 = kz2_on and not na(time(timeframe.period, kz2_time, kz_timezone))
-    in_gt2 = gt2_on and not na(time(timeframe.period, gt2_time, kz_timezone))
-    bgcolor(in_kz1 ? kz1_color : in_gt1 ? gt1_color : in_kz2 ? kz2_color : in_gt2 ? gt2_color : na, title="Kill Zones")
+in_kz1 = show_kz and kz1_on and not na(time(timeframe.period, kz1_time, kz_timezone))
+in_gt1 = show_kz and gt1_on and not na(time(timeframe.period, gt1_time, kz_timezone))
+in_kz2 = show_kz and kz2_on and not na(time(timeframe.period, kz2_time, kz_timezone))
+in_gt2 = show_kz and gt2_on and not na(time(timeframe.period, gt2_time, kz_timezone))
+bgcolor(in_kz1 ? kz1_color : in_gt1 ? gt1_color : in_kz2 ? kz2_color : in_gt2 ? gt2_color : na, title="Kill Zones")
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SIGNALS: Discount + Bullish CHoCH = Long, Premium + Bearish CHoCH = Short
@@ -649,7 +650,7 @@ if sniper_long or sniper_short
 
 // Draw entry/SL/TP lines on last signal
 if not na(last_entry_price) and (barstate.islastconfirmedhistory or barstate.islast)
-    rightTime = last_bar_time + 20 * (time - time[1])
+    int rr_right = bar_index + 20
     var line entry_line = line.new(na, na, na, na, color=color.new(color.white, 50), style=line.style_solid, width=2)
     var line sl_line = line.new(na, na, na, na, color=color.red, style=line.style_dashed, width=2)
     var line tp_line = line.new(na, na, na, na, color=color.green, style=line.style_dashed, width=2)
@@ -657,21 +658,21 @@ if not na(last_entry_price) and (barstate.islastconfirmedhistory or barstate.isl
     var label sl_lbl = label.new(na, na, color=color(na), textcolor=color.red, style=label.style_label_left, size=size.tiny)
     var label tp_lbl = label.new(na, na, color=color(na), textcolor=color.green, style=label.style_label_left, size=size.tiny)
 
-    entry_line.set_first_point(chart.point.new(bar_index, na, last_entry_price))
-    entry_line.set_second_point(chart.point.new(rightTime, na, last_entry_price))
-    entry_lbl.set_point(chart.point.new(rightTime, na, last_entry_price))
+    entry_line.set_first_point(chart.point.from_index(bar_index, last_entry_price))
+    entry_line.set_second_point(chart.point.from_index(rr_right, last_entry_price))
+    entry_lbl.set_point(chart.point.from_index(rr_right, last_entry_price))
     entry_lbl.set_text("Entry: " + str.tostring(last_entry_price, format.mintick))
 
     if not na(last_sl_price)
-        sl_line.set_first_point(chart.point.new(bar_index, na, last_sl_price))
-        sl_line.set_second_point(chart.point.new(rightTime, na, last_sl_price))
-        sl_lbl.set_point(chart.point.new(rightTime, na, last_sl_price))
+        sl_line.set_first_point(chart.point.from_index(bar_index, last_sl_price))
+        sl_line.set_second_point(chart.point.from_index(rr_right, last_sl_price))
+        sl_lbl.set_point(chart.point.from_index(rr_right, last_sl_price))
         sl_lbl.set_text("SL: " + str.tostring(last_sl_price, format.mintick))
 
     if not na(last_tp_price)
-        tp_line.set_first_point(chart.point.new(bar_index, na, last_tp_price))
-        tp_line.set_second_point(chart.point.new(rightTime, na, last_tp_price))
-        tp_lbl.set_point(chart.point.new(rightTime, na, last_tp_price))
+        tp_line.set_first_point(chart.point.from_index(bar_index, last_tp_price))
+        tp_line.set_second_point(chart.point.from_index(rr_right, last_tp_price))
+        tp_lbl.set_point(chart.point.from_index(rr_right, last_tp_price))
         tp_lbl.set_text("TP: " + str.tostring(last_tp_price, format.mintick))
 
 // Dashboard table
