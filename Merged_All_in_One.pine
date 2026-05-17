@@ -3848,7 +3848,7 @@ if respectvol
 var cumVol = 0.
 cumVol += nz(volume)
 if barstate.islast and cumVol == 0
-    runtime.error("The data vendor doesn't provide volume data for this symbol.")
+    runtime.error("No volume data for this symbol. Volume-based indicators disabled.")
 
 
 
