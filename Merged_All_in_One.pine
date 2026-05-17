@@ -4251,7 +4251,7 @@ if switch_smc or respectsmc or leadingindicator == "Smart Money Concepts"
 
     // SMC signals
     // Leading: event-based (fire on trend change only)
-    smc_trend_changed = smc_swingTrend.bias != nz(smc_swingTrend[1].bias, 0)
+    smc_trend_changed = smc_swingTrend.bias != nz((smc_swingTrend[1]).bias, 0)
     smc_long := smc_swingTrend.bias == SMC_BULLISH and smc_trend_changed
     smc_short := smc_swingTrend.bias == SMC_BEARISH and smc_trend_changed
     // Confirmation: state-based (persistent bias)
