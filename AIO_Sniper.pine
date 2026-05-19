@@ -72,6 +72,13 @@ rr_dash_pos = input.string("bottom_right", "Dashboard Position", options=["top_l
 sig_group = "Signals"
 show_signals = input.bool(true, "Show Entry Signals", group=sig_group)
 
+// ── Trading Plays ─────────────────────────────────────────────────────────────
+play_group = "Trading Plays"
+show_play1 = input.bool(true, "Play 1: 回調狙擊 (Continuation)", group=play_group)
+show_play2 = input.bool(true, "Play 2: 流動性掃蕩 (Liq Sweep)", group=play_group)
+show_play3 = input.bool(true, "Play 3: 午後反轉 (Trend Shift)", group=play_group)
+play_sweep_window = input.int(5, "Sweep CHoCH Window (bars)", minval=1, maxval=20, group=play_group)
+
 // ══════════════════════════════════════════════════════════════════════════════
 // SMC CORE
 // ══════════════════════════════════════════════════════════════════════════════
@@ -257,6 +264,12 @@ smc_drawOBs(bool internal, float pd_mid) =>
                 b.set_top_left_point(chart.point.from_time(eachOB.barTime, eachOB.barHigh))
                 b.set_bottom_right_point(chart.point.from_time(last_bar_time, eachOB.barLow))
                 b.set_bgcolor(obColor)
+                b.set_border_color(eachOB.bias == SMC_BULLISH ? color.new(#089981, 40) : color.new(#f23645, 40))
+                b.set_border_width(1)
+                string obTag = (eachOB.bias == SMC_BULLISH ? "Bull OB " : "Bear OB ") + str.tostring(eachOB.barLow, format.mintick) + "-" + str.tostring(eachOB.barHigh, format.mintick)
+                b.set_text(obTag)
+                b.set_text_color(eachOB.bias == SMC_BULLISH ? color.new(#089981, 20) : color.new(#f23645, 20))
+                b.set_text_size(size.tiny)
 
 smc_deleteFVGs() =>
     for [index, eachFVG] in smc_fvgs
@@ -273,11 +286,13 @@ smc_drawFVGs(float pd_mid) =>
     if bullishFVG
         // Zone filter: bullish FVG must be in discount zone
         if not pd_zone_filter or high[2] < pd_mid
-            smc_fvgs.unshift(smc_fairValueGap.new(low, high[2], SMC_BULLISH, box.new(bar_index - 1, low, bar_index, math.avg(low, high[2]), border_color=fvgBullColor, bgcolor=fvgBullColor), box.new(bar_index - 1, math.avg(low, high[2]), bar_index, high[2], border_color=fvgBullColor, bgcolor=fvgBullColor)))
+            float gapSize = low - high[2]
+            smc_fvgs.unshift(smc_fairValueGap.new(low, high[2], SMC_BULLISH, box.new(bar_index - 1, low, bar_index, math.avg(low, high[2]), border_color=fvgBullColor, bgcolor=fvgBullColor, text="FVG +" + str.tostring(gapSize, format.mintick), text_color=color.new(#089981, 20), text_size=size.tiny), box.new(bar_index - 1, math.avg(low, high[2]), bar_index, high[2], border_color=fvgBullColor, bgcolor=fvgBullColor)))
     if bearishFVG
         // Zone filter: bearish FVG must be in premium zone
         if not pd_zone_filter or low[2] > pd_mid
-            smc_fvgs.unshift(smc_fairValueGap.new(high, low[2], SMC_BEARISH, box.new(bar_index - 1, high, bar_index, math.avg(high, low[2]), border_color=fvgBearColor, bgcolor=fvgBearColor), box.new(bar_index - 1, math.avg(high, low[2]), bar_index, low[2], border_color=fvgBearColor, bgcolor=fvgBearColor)))
+            float gapSize = low[2] - high
+            smc_fvgs.unshift(smc_fairValueGap.new(high, low[2], SMC_BEARISH, box.new(bar_index - 1, high, bar_index, math.avg(high, low[2]), border_color=fvgBearColor, bgcolor=fvgBearColor, text="FVG -" + str.tostring(gapSize, format.mintick), text_color=color.new(#f23645, 20), text_size=size.tiny), box.new(bar_index - 1, math.avg(high, low[2]), bar_index, low[2], border_color=fvgBearColor, bgcolor=fvgBearColor)))
 
 smc_getStructure(int size, bool equalHL = false, bool internal = false) =>
     currentLeg = smc_leg(size)
@@ -593,6 +608,110 @@ plotshape(show_signals and sniper_long ? low : na, title='Sniper Long', text='LO
 plotshape(show_signals and sniper_short ? high : na, title='Sniper Short', text='SHORT', textcolor=color.white, style=shape.labeldown, size=size.small, location=location.abovebar, color=color.new(color.red, 0))
 
 // ══════════════════════════════════════════════════════════════════════════════
+// TRADING PLAYS
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── State Tracking ────────────────────────────────────────────────────────────
+var int morning_trend = 0
+var bool swept_pdl = false
+var bool swept_pdh = false
+var int sweep_bar = 0
+var float sweep_low = na
+var float sweep_high = na
+
+// Track morning trend before 13:00 HKT
+in_morning = not na(time(timeframe.period, "0930-1300", kz_timezone))
+if in_morning
+    morning_trend := smc_swingTrend.bias
+
+// ── Liquidity Sweep Detection ─────────────────────────────────────────────────
+sweep_below_pdl = not na(prev_day_low) and low < prev_day_low and close > prev_day_low
+sweep_above_pdh = not na(prev_day_high) and high > prev_day_high and close < prev_day_high
+
+if sweep_below_pdl
+    swept_pdl := true
+    sweep_bar := bar_index
+    sweep_low := low
+if sweep_above_pdh
+    swept_pdh := true
+    sweep_bar := bar_index
+    sweep_high := high
+
+// Reset sweep flags after window expires
+if swept_pdl and bar_index - sweep_bar > play_sweep_window
+    swept_pdl := false
+if swept_pdh and bar_index - sweep_bar > play_sweep_window
+    swept_pdh := false
+
+// ── Play 1: 順勢回調狙擊 (Trend Continuation) ────────────────────────────────
+// Long: Bullish trend + price in discount + touches bullish OB
+// Short: Bearish trend + price in premium + touches bearish OB
+bool price_in_bull_ob = false
+float bull_ob_low = na
+float bull_ob_high = na
+bool price_in_bear_ob = false
+float bear_ob_low = na
+float bear_ob_high = na
+
+if smc_swingOBs.size() > 0
+    for eachOB in smc_swingOBs
+        if eachOB.bias == SMC_BULLISH and not na(pd_mid) and eachOB.barHigh < pd_mid
+            if low <= eachOB.barHigh and close >= eachOB.barLow
+                price_in_bull_ob := true
+                bull_ob_low := nz(bull_ob_low, eachOB.barLow)
+                bull_ob_high := eachOB.barHigh
+        if eachOB.bias == SMC_BEARISH and not na(pd_mid) and eachOB.barLow > pd_mid
+            if high >= eachOB.barLow and close <= eachOB.barHigh
+                price_in_bear_ob := true
+                bear_ob_high := nz(bear_ob_high, eachOB.barHigh)
+                bear_ob_low := eachOB.barLow
+
+bool play1_long = show_play1 and smc_swingTrend.bias == SMC_BULLISH and in_discount and price_in_bull_ob
+bool play1_short = show_play1 and smc_swingTrend.bias == SMC_BEARISH and in_premium and price_in_bear_ob
+
+// ── Play 2: 早市流動性掃蕩 (Morning Liquidity Sweep) ──────────────────────────
+// Long: Sweep below PDL + reclaim + Bullish CHoCH in morning KZ
+// Short: Sweep above PDH + reject + Bearish CHoCH in morning KZ
+bool play2_long = show_play2 and swept_pdl and (smc_currentAlerts.swingBullishCHoCH or smc_currentAlerts.internalBullishCHoCH) and in_kz1
+bool play2_short = show_play2 and swept_pdh and (smc_currentAlerts.swingBearishCHoCH or smc_currentAlerts.internalBearishCHoCH) and in_kz1
+
+// ── Play 3: 午後結構破壞跟隨 (Afternoon Trend Shift) ──────────────────────────
+// Short: Morning was bullish + afternoon Bearish CHoCH + price in premium
+// Long: Morning was bearish + afternoon Bullish CHoCH + price in discount
+bool play3_short = show_play3 and morning_trend == SMC_BULLISH and smc_currentAlerts.swingBearishCHoCH and in_premium and (in_kz2 or in_gt1)
+bool play3_long = show_play3 and morning_trend == SMC_BEARISH and smc_currentAlerts.swingBullishCHoCH and in_discount and (in_kz2 or in_gt1)
+
+// ── Active Play ───────────────────────────────────────────────────────────────
+bool any_play_long = play1_long or play2_long or play3_long
+bool any_play_short = play1_short or play2_short or play3_short
+string active_play = any_play_long or any_play_short ? (play1_long or play1_short ? "1 回調狙擊" : play2_long or play2_short ? "2 流動性掃蕩" : "3 午後反轉") : "—"
+
+// ── Play Visual Labels ────────────────────────────────────────────────────────
+if play1_long
+    label.new(chart.point.from_index(bar_index, low), "PLAY 1: 回調狙擊\nBuy OB test in Discount\nSL below OB " + str.tostring(bull_ob_low, format.mintick), color=color.new(color.green, 80), textcolor=color.white, style=label.style_label_up, size=size.small)
+if play1_short
+    label.new(chart.point.from_index(bar_index, high), "PLAY 1: 回調狙擊\nShort OB test in Premium\nSL above OB " + str.tostring(bear_ob_high, format.mintick), color=color.new(color.red, 80), textcolor=color.white, style=label.style_label_down, size=size.small)
+
+if play2_long
+    label.new(chart.point.from_index(bar_index, low), "PLAY 2: 流動性掃蕩\nPDL Sweep + Bullish CHoCH\nSL below sweep " + str.tostring(sweep_low, format.mintick), color=color.new(color.yellow, 70), textcolor=color.white, style=label.style_label_up, size=size.small)
+if play2_short
+    label.new(chart.point.from_index(bar_index, high), "PLAY 2: 流動性掃蕩\nPDH Sweep + Bearish CHoCH\nSL above sweep " + str.tostring(sweep_high, format.mintick), color=color.new(color.yellow, 70), textcolor=color.white, style=label.style_label_down, size=size.small)
+
+if play3_long
+    label.new(chart.point.from_index(bar_index, low), "PLAY 3: 午後反轉\nAfternoon Bullish CHoCH\nSL below " + str.tostring(smc_swingLow.currentLevel, format.mintick), color=color.new(color.orange, 70), textcolor=color.white, style=label.style_label_up, size=size.small)
+if play3_short
+    label.new(chart.point.from_index(bar_index, high), "PLAY 3: 午後反轉\nAfternoon Bearish CHoCH\nSL above " + str.tostring(smc_swingHigh.currentLevel, format.mintick), color=color.new(color.orange, 70), textcolor=color.white, style=label.style_label_down, size=size.small)
+
+// ── Liquidity Sweep Visuals ───────────────────────────────────────────────────
+if sweep_below_pdl and not na(prev_day_low)
+    line.new(chart.point.from_index(bar_index - 3, prev_day_low), chart.point.from_index(bar_index, low), color=color.new(color.yellow, 50), style=line.style_dotted, width=2)
+    label.new(chart.point.from_index(bar_index, low), "BSL Sweep", color=color(na), textcolor=color.yellow, style=label.style_label_up, size=size.tiny)
+
+if sweep_above_pdh and not na(prev_day_high)
+    line.new(chart.point.from_index(bar_index - 3, prev_day_high), chart.point.from_index(bar_index, high), color=color.new(color.yellow, 50), style=line.style_dotted, width=2)
+    label.new(chart.point.from_index(bar_index, high), "SSL Sweep", color=color(na), textcolor=color.yellow, style=label.style_label_down, size=size.tiny)
+
+// ══════════════════════════════════════════════════════════════════════════════
 // R:R DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -684,21 +803,31 @@ if show_rr_dashboard and not na(last_entry_price) and (barstate.islastconfirmedh
     float position_size = risk_pts > 0 ? risk_amount / risk_pts : 0
     bool rr_ok = rr_ratio >= rr_min_rr
 
-    var table rr_tab = table.new(rr_dash_pos, 2, 7, color.new(color.black, 20), color.gray, 1, color.new(color.gray, 80), 1)
-    table.cell(rr_tab, 0, 0, "Direction", text_color=color.gray, text_size=size.small)
-    table.cell(rr_tab, 1, 0, last_direction, text_color=last_direction == "LONG" ? color.green : color.red, text_size=size.small)
-    table.cell(rr_tab, 0, 1, "Entry", text_color=color.gray, text_size=size.small)
-    table.cell(rr_tab, 1, 1, str.tostring(last_entry_price, format.mintick), text_color=color.white, text_size=size.small)
-    table.cell(rr_tab, 0, 2, "SL", text_color=color.gray, text_size=size.small)
-    table.cell(rr_tab, 1, 2, str.tostring(last_sl_price, format.mintick), text_color=color.red, text_size=size.small)
-    table.cell(rr_tab, 0, 3, "TP1", text_color=color.gray, text_size=size.small)
-    table.cell(rr_tab, 1, 3, str.tostring(last_tp_price, format.mintick), text_color=color.green, text_size=size.small)
-    table.cell(rr_tab, 0, 4, "R:R", text_color=color.gray, text_size=size.small)
-    table.cell(rr_tab, 1, 4, "1:" + str.tostring(rr_ratio, "#.##"), text_color=rr_ok ? color.green : color.red, text_size=size.small)
-    table.cell(rr_tab, 0, 5, "Size", text_color=color.gray, text_size=size.small)
-    table.cell(rr_tab, 1, 5, str.tostring(position_size, "#.##") + " lots", text_color=color.white, text_size=size.small)
-    table.cell(rr_tab, 0, 6, "Mode", text_color=color.gray, text_size=size.small)
-    table.cell(rr_tab, 1, 6, rr_sl_mode == "Aggressive (OB+Buffer)" ? "Aggressive" : "Conservative", text_color=color.orange, text_size=size.small)
+    var table rr_tab = table.new(rr_dash_pos, 2, 10, color.new(color.black, 20), color.gray, 1, color.new(color.gray, 80), 1)
+    table.cell(rr_tab, 0, 0, "Play", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 0, active_play, text_color=any_play_long ? color.green : any_play_short ? color.red : color.gray, text_size=size.small)
+    table.cell(rr_tab, 0, 1, "Direction", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 1, last_direction, text_color=last_direction == "LONG" ? color.green : color.red, text_size=size.small)
+    table.cell(rr_tab, 0, 2, "Entry", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 2, str.tostring(last_entry_price, format.mintick), text_color=color.white, text_size=size.small)
+    table.cell(rr_tab, 0, 3, "SL", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 3, str.tostring(last_sl_price, format.mintick), text_color=color.red, text_size=size.small)
+    table.cell(rr_tab, 0, 4, "TP1", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 4, str.tostring(last_tp_price, format.mintick), text_color=color.green, text_size=size.small)
+    table.cell(rr_tab, 0, 5, "R:R", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 5, "1:" + str.tostring(rr_ratio, "#.##"), text_color=rr_ok ? color.green : color.red, text_size=size.small)
+    table.cell(rr_tab, 0, 6, "Size", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 6, str.tostring(position_size, "#.##") + " lots", text_color=color.white, text_size=size.small)
+    table.cell(rr_tab, 0, 7, "Mode", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 7, rr_sl_mode == "Aggressive (OB+Buffer)" ? "Aggressive" : "Conservative", text_color=color.orange, text_size=size.small)
+    string zone_text = in_kz1 ? "早市 KZ" : in_gt1 ? "午間 GT" : in_kz2 ? "午後 KZ" : in_gt2 ? "收市 GT" : "Off-hours"
+    color zone_color = in_kz1 ? color.green : in_gt1 ? color.gray : in_kz2 ? color.yellow : in_gt2 ? color.red : color.gray
+    table.cell(rr_tab, 0, 8, "Zone", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 8, zone_text, text_color=zone_color, text_size=size.small)
+    string trend_text = smc_swingTrend.bias == SMC_BULLISH ? "Bullish ↑" : smc_swingTrend.bias == SMC_BEARISH ? "Bearish ↓" : "Neutral"
+    color trend_color = smc_swingTrend.bias == SMC_BULLISH ? color.green : smc_swingTrend.bias == SMC_BEARISH ? color.red : color.gray
+    table.cell(rr_tab, 0, 9, "Trend", text_color=color.gray, text_size=size.small)
+    table.cell(rr_tab, 1, 9, trend_text, text_color=trend_color, text_size=size.small)
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ALERTS
@@ -710,3 +839,6 @@ alertcondition(smc_currentAlerts.swingBullishCHoCH, title='Swing Bullish CHoCH',
 alertcondition(smc_currentAlerts.swingBearishCHoCH, title='Swing Bearish CHoCH', message='Swing Bearish CHoCH detected')
 alertcondition(smc_currentAlerts.equalHighs, title='Equal Highs', message='Equal highs detected - liquidity target')
 alertcondition(smc_currentAlerts.equalLows, title='Equal Lows', message='Equal lows detected - liquidity target')
+alertcondition(play1_long or play1_short, title='Play 1: 回調狙擊', message='Play 1 Trend Continuation - OB test in zone')
+alertcondition(play2_long or play2_short, title='Play 2: 流動性掃蕩', message='Play 2 Liquidity Sweep - Sweep + CHoCH')
+alertcondition(play3_long or play3_short, title='Play 3: 午後反轉', message='Play 3 Afternoon Trend Shift - CHoCH reversal')
